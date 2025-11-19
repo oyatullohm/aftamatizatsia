@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="uz">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mahsulot — Instruktsiya (Qora UI)</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <style>
+    .show-text.active {
+    background-color: #000 !important; /* qora */
+    color: #fff !important;            /* oq matn */
+    border-color: #000 !important;
+}
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-dark py-3 border-bottom border-secondary">
+  <div class="container">
+    <div class="row w-100 align-items-center">
+      <div class="col d-flex align-items-center">
+        <h5 class="mb-0">Редактор товара (админ-макет)</h5>
+      </div>
+      <div class="col d-flex justify-content-end gap-2 flex-wrap">
+        <button class="btn btn-outline-dark">Ибуклин</button>
+        <button class="btn btn-outline-dark">АЦЦ Лонг</button>
+        <button class="btn btn-outline-dark">Предпросмотр</button>
+        <button class="btn btn-dark">Сахранити</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+
+<div class="container mt-3">
+
+  <div class="row g-2">
+    <div class="col-2">
+      <button class="btn btn-dark w-100 show-text active" data-target="1-tugma">Базовье</button>
+
+    </div>
+    <div class="col-2">
+      <button class="btn btn-outline-dark w-100 show-text" data-target="2-tugma">Медицинские</button>
+ 
+    </div>
+    <div class="col-2">
+      <button class="btn btn-outline-dark w-100 show-text" data-target="3-tugma">Контенет/Инуструкция</button>
+  
+    </div>
+    <div class="col-2">
+      <button class="btn btn-outline-dark w-100 show-text" data-target="4-tugma">Медиа</button>
+   
+    </div>
+    <div class="col-2">
+      <button class="btn btn-outline-dark w-100 show-text" data-target="5-tugma">SEO Категории</button>
+    
+    </div>
+    <div class="col-2">
+      <button class="btn btn-outline-dark w-100 show-text" data-target="6-tugma">Справочники</button>
+
+    </div>
+  </div>
+</div>
+
+<div class="container col-12 mt-4 content-section" id="1-tugma" style="display: block;">
+  <div class="row">
+    <div class="col-6 d-flex">
+      <div class="card p-4 mt-4 w-100" id="displayBox">
+        <h6>ERP (только чтение)</h6>
+        <hr>
+        <div class="mb-3">
+          <div class="row">
+            <div class="col-6">
+              <label for="UID" class="form-label">UID</label>
+              <input type="text" class="form-control" id="UID" value="665522">
+            </div>
+            <div class="col-6">
+                <label for="SKU" class="form-label">SKU</label>
+                <input type="text" class="form-control" id="SKU" value="55555">
+            </div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="ERP" class="form-label">Название из ERP</label>
+          <input type="text" class="form-control" id="ERP" value="Ибуклин таблетки покрытые пленочной оболочкой 400 мг + 325 мг №10">
+        </div>
+      
+       <div class="row mb-3">
+            <div class="col-6">
+              <label for="Производитель" class="form-label">Производитель</label>
+              <input type="text" class="form-control" id="Производитель" value="Dr. Reddy's Laboratories Ltd.">
+            </div>
+            <div class="col-6">
+                <label for="Страна" class="form-label">Страна</label>
+                <input type="text" class="form-control" id="Страна" value="IN">
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-6">
+              <label for="МНН" class="form-label">МНН</label>
+              <input type="text" class="form-control" id="МНН" value="Ибупрофен + Парацетамол">
+            </div>
+            <div class="col-6">
+                <label for="Форма выпуска" class="form-label">Форма выпуска</label>
+                <input type="text" class="form-control" id="Форма выпуска" value="Форма выпуска">
+            </div>
+        </div>
+
+         <div class="row mb-3">
+            <div class="col-4">
+              <label for="Тип продукта" class="form-label">Тип продукта</label>
+              <input type="text" class="form-control" id="Тип продукта" value="ЛС">
+            </div>
+            <div class="col-4">
+                <label for="Класс" class="form-label">Класс</label>
+                <input type="text" class="form-control" id="Класс" value="НПВС">
+            </div>   
+            <div class="col-4">
+                <label for="Кол-во в уп." class="form-label">Кол-во в уп.</label>
+                <input type="text" class="form-control" id="Кол-во в уп." value="10">
+            </div>
+        </div>
+
+       <div class="row mb-3 align-items-end">
+            <div class="col-4">
+                <label for="Цена" class="form-label">Цена</label>
+                <input type="text" class="form-control" id="Цена" value="ЛС">
+            </div>
+            <div class="col-4">
+                <label for="Годен до" class="form-label">Годен до</label>
+                <input type="date" class="form-control" id="Годен до" value="2027-12-31">
+            </div>   
+            <div class="col-4">
+              <div class="form-check form-switch d-flex align-items-center justify-content-center h-100">
+              <input class="form-check-input me-2 " type="checkbox" role="switch" id="flexSwitchCheckDefault" checked>
+              <label class="form-check-label mb-0" for="flexSwitchCheckDefault">В наличии</label>
+          </div>
+            </div>
+        </div>
+
+        <h6>Эти поля приходят из 1С/ERP и не редактируются в CMS.</h6>
+      </div>
+    </div>
+    
+    <div class="col-6 d-flex">
+      <div class="card p-4 mt-4 w-100" id="displayBox">
+        <h6>Параметры карточки</h6>
+       <hr>
+         <div class="mb-3">
+          <label for="Отображаемое название" class="form-label">Отображаемое название</label>
+          <input type="text" class="form-control" id="Отображаемое название" value="Ибуклин таблетки покрытые пленочной оболочкой 400 мг + 325 мг №10">
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-6">
+              <label for="Бренд" class="form-label">Бренд</label>
+              <input type="text" class="form-control" id="Бренд" value="Dr. Reddy's Laboratories Ltd.">
+            </div>
+            <div class="col-6">
+                <label for="URL-ключ" class="form-label">URL-ключ</label>
+                <input type="text" class="form-control" id="URL-ключ" value="ibuklin-tabpo-plen-400mg325mg-no1">
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-4">
+              <label for="Статус" class="form-label">Статус</label>
+              <input type="text" class="form-control" id="Статус" value="active">
+            </div>
+            <div class="col-4">
+                <label for="Видимость" class="form-label">Видимость</label>
+                <input type="text" class="form-control" id="Видимость" value="catalog_search">
+            </div>   
+            <div class="col-4">
+                <label for="Ед. изм." class="form-label">Ед. изм.</label>
+                <input type="text" class="form-control" id="Ед. изм." value="таблетки">
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-4">
+              <label for="Цена" class="form-label">Цена</label>
+              <input type="number" class="form-control" id="Цена" value="255">
+            </div>
+            <div class="col-4">
+                <label for="Старая цена" class="form-label">Старая цена</label>
+                <input type="number" class="form-control" id="Старая цена" value="255">
+            </div>   
+            <div class="col-4">
+                <label for="НДС, %" class="form-label">НДС, %</label>
+                <input type="number" class="form-control" id="НДС, %" value="299">
+            </div>
+        </div>
+
+        <!-- Bo'sh joy qo'shildi -->
+        <div class="mt-auto" style="min-height: 60px;"></div>
+
+      </div>
+    </div>
+  </div>
+  <br>
+  <br>
+</div>
+
+
+<div class="container col-12 mt-4 content-section" id="2-tugma" style="display: none;">
+  <div class="row">
+    <div class="col-12 d-flex">
+      <div class="card p-4 mt-4 w-100" >
+        <h6>Медицинские данные</h6>
+        <hr>
+         <div class="row mb-3">
+            <div class="col-6">
+              <label for="МНН (рус)" class="form-label">МНН (рус)</label>
+              <input type="text" class="form-control" id="МНН (рус)" value="Ибупрофен + Парацетамол">
+            </div>
+            <div class="col-6">
+                <label for="МНН (лат)" class="form-label">МНН (лат)</label>
+                <input type="text" class="form-control" id="МНН (лат)" value="Форма выпуска">
+            </div>
+        </div>      
+           <div class="row mb-3">
+            <div class="col-6">
+              <label for="Торговое наименование (рус)" class="form-label">Торговое наименование (рус)</label>
+              <input type="text" class="form-control" id="Торговое наименование (рус)" value="Ибуклин">
+            </div>
+            <div class="col-6">
+                <label for="Торговое наименование (лат)" class="form-label">Торговое наименование (лат)</label>
+                <input type="text" class="form-control" id="Торговое наименование (лат)" value="Ibuclin">
+            </div>
+        </div>
+
+         <div class="row mb-3">
+            <div class="col-4">
+              <label for="АТХ коды" class="form-label">АТХ коды</label>
+              <input type="text" class="form-control" id="АТХ коды" value="N02BE51">
+            </div>
+            <div class="col-4">
+                <label for="МКБ-10 (коды)" class="form-label">МКБ-10 (коды)</label>
+                <input type="text" class="form-control" id="МКБ-10 (коды)" value="J06.9, R52">
+            </div>   
+            <div class="col-4">
+                <label for="Возрастные ограничения" class="form-label">Возрастные ограничения.</label>
+                <input type="text" class="form-control" id="Возрастные ограничения" value="12+">
+            </div>
+        </div>
+
+         <div class="row mb-3">
+            <div class="col-6">
+              <label for="Форма" class="form-label">Форма</label>
+              <input type="text" class="form-control" id="Форма" value="таблетки, покрытые пленочной оболочкой">
+            </div>
+            <div class="col-6">
+                <label for="Дозировка/сила" class="form-label">Дозировка/сила</label>
+                <input type="text" class="form-control" id="Дозировка/сила" value="Ибупрофен 400 мг + Парацетамол 325 мг">
+            </div>
+        </div>
+
+
+
+        <div class="row mb-3">
+            <div class="col-6">
+              <label for="Путь введения" class="form-label">Путь введения</label>
+              <input type="text" class="form-control" id="Путь введения" value="перорально">
+            </div>
+           <div class="col-6">
+              <label for="Схема приёма (posology)" class="form-label">Схема приёма (posology)</label>
+              <textarea class="form-control" id="Схема приёма (posology)" rows="3" >Взрослым по 1 таблетке 2–3 раза в сутки после еды</textarea>
+            </div>
+        </div>
+
+            <div class="row mb-3" id="main-input-row">
+        <div class="col-4">
+            <label for="АТХ-коды-1" class="form-label">АТХ коды</label>
+            <input type="text" class="form-control" id="АТХ-коды-1" value="N02BE51">
+        </div>
+        <div class="col-4">
+            <label for="МКБ-10-1" class="form-label">МКБ-10 (коды)</label>
+            <input type="text" class="form-control" id="МКБ-10-1" value="J06.9, R52">
+        </div>   
+        <div class="col-4">
+            <label for="Возрастные-ограничения-1" class="form-label">Возрастные ограничения</label>
+            <input type="text" class="form-control" id="Возрастные-ограничения-1" value="12+">
+        </div>
+    </div>
+       <div id="additional-rows"></div>
+
+    <div class="col-2 mt-3">
+        <button class="btn btn-dark" id="add-row-btn">Добавить строку</button>
+    </div>
+<br>
+<br>
+<br>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container col-12 mt-4 content-section" id="3-tugma" style="display: none;">
+
+  <div class="row">
+    <div class="col-6 d-flex">
+      <div class="card p-4 mt-4 w-100" >
+        <h6>Инструкция (HTML)</h6>
+        <hr>
+        <textarea style="height: 255px !important;" name="" id=""><h2>Условия хранения</h2><p>Хранить в недоступном для детей месте при t≤25°C.</p>D</textarea>
+        <span>
+          Храним как HTML (как у Риглы). Для API можно отдавать и plain_text.
+      </span>
+      </div>
+
+    </div>
+
+    <div class="col-6 d-flex">
+      <div class="card p-4 mt-4 w-100" >
+        <h6>Инструкция (Plain text)</h6>
+        <hr>
+        <textarea style="height: 255px !important;" name="" id="">Условия хранения: Хранить при t≤25°C. Взаимодействие: ...</textarea>
+        <span>
+         Используется для поиска и быстрых превью.
+      </span>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="container col-12 mt-4 content-section" id="4-tugma" style="display: none;">
+    <div class="row">
+    <div class="col-6 d-flex">
+      <div class="card p-4 mt-4 w-100" >
+        <h6>Обложка</h6>
+        <hr>
+         <div class="mb-3">
+          <label for="URL" class="form-label">URL</label>
+          <input type="text" class="form-control" id="URL" value="https://cdn.example.com/images/acc_long_600_10.jpg">
+        </div>
+        <div class="mb-3">
+          <label for="Подпись" class="form-label">Подпись</label>
+          <input type="text" class="form-control" id="Подпись" value="АЦЦ Лонг, 10 таб.">
+        </div>
+
+      </div>
+    </div>
+
+    <div class="col-6 d-flex">
+  <div class="card p-4 mt-4 w-100">
+    <h6>Галерея</h6>
+    <hr>
+
+    <div id="gallery-wrapper">
+      <div class="row gallery-item">
+        <div class="col-4">
+          
+          <input type="text" class="form-control" value="https://cdn.example.com/images/acc_long_600_10.jpg">
+        </div>
+
+        <div class="col-4">
+          
+          <input type="text" class="form-control" value="https://cdn.example.com/images/acc_long_600_10.jpg">
+        </div>
+
+        <div class="col-4 d-flex align-items-end">
+          <button class="btn btn-light delete-btn">Удалит</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-3 mb-3 mt-3">
+      <button class="btn btn-light" id="add-btn">Добавить</button>
+    </div>
+  </div>
+</div>
+
+    </div>
+
+</div>
+
+<div class="container col-12 mt-4 content-section" id="5-tugma" style="display: none;">
+  <div class="row">
+    <div class="col-6 d-flex">
+      <div class="card p-4 mt-4 w-100" >
+        <h4>SEO</h4>
+        <hr>
+          <div class="mb-3">
+          <label for="Meta title" class="form-label">Meta title</label>
+          <input type="text" class="form-control" id="Meta title" value="Ибуклин 400 мг + 325 мг №10 — цена, инструкция">
+        </div>
+        <div class="mb-3">
+          <label for="Meta description" class="form-label">Meta description</label>
+          <textarea class="form-control" name="" id="Meta description">Ибуклин: показания, цена, доставка. Заказать онлайн.</textarea>
+         
+      </div>
+    </div>
+    
+  </div>
+  <div class="col-6 d-flex">
+      <div class="card p-4 mt-4 w-100" >
+        <h4>Категории и теги</h4>
+        <hr>
+        <div class="row">
+          <div class="col mb-3">Каталог
+            <br>
+          </div>
+        </div>
+
+          <div class="row">
+            <div class="col">
+              <span class="badge rounded-pill bg-light text-dark border px-3 py-2 me-2 mb-2">
+                Анальгетики
+              </span>
+
+              <span class="badge rounded-pill bg-light text-dark border px-3 py-2 me-2 mb-2">
+                Простуда и грипп
+              </span>
+            </div>
+            <p class="text-muted">Выбор через дерево категорий (UX). Здесь — бейджи для наглядности.</p>
+
+          </div>
+          <div class="row">
+             <div class="col mb-3">Симптомы
+            <br>
+          </div>
+          </div>
+          <div class="row">
+                <div class="col">
+              <span class="badge rounded-pill bg-light text-dark border px-3 py-2 me-2 mb-2">
+                Боль
+              </span>
+
+              <span class="badge rounded-pill bg-light text-dark border px-3 py-2 me-2 mb-2">
+                Жар
+              </span>
+            </div>
+          </div>
+          <div class="row">
+             <div class="col mb-3">Болезни
+            <br>
+          </div>
+
+             <div class="row">
+                <div class="col">
+              <span class="badge rounded-pill bg-light text-dark border px-3 py-2 me-2 mb-2">
+                ОРВИ
+              </span>
+            </div>
+          </div>
+           <div class="row">
+             <div class="col mb-3">Теги
+            <br>
+          </div>
+
+           <div class="row">
+                <div class="col">
+              <span class="badge rounded-pill bg-light text-dark border px-3 py-2 me-2 mb-2">
+                без рецепта
+              </span>
+
+              <span class="badge rounded-pill bg-light text-dark border px-3 py-2 me-2 mb-2">
+                для взрослых
+              </span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+
+</div>
+</div>
+<div class="container col-12 mt-4 content-section" id="6-tugma" style="display: none;">
+  <div class="row">
+    <div class="col-4 d-flex">
+      <div class="card p-4 mt-4 w-100" >
+        <h4>Категории</h4>
+        <hr>
+        <textarea class="form-control" rows="15"
+          placeholder="Kaждая Категория новой строки"></textarea>
+
+        <p class="text-muted">Древовидная структура хранится в базе. Здесь — текстовый макет.</p> 
+      </div>
+    </div>
+    <div class="col-4 d-flex">
+      <div class="card p-4 mt-4 w-100" >
+        <h4>Симптомы</h4>
+        <hr>
+  <textarea class="form-control" rows="15"
+          placeholder="Боль
+Жар
+Кашель"></textarea>
+      </div>
+    </div>
+
+        <div class="col-4 d-flex">
+      <div class="card p-4 mt-4 w-100" >
+        <h4>Болезни (МКБ-10)</h4>
+        <hr>
+      <textarea class="form-control" rows="15"
+          placeholder="JO6.9 — ОРИ неуточненная
+R52 — Боль неуточненная"></textarea>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+
+
+document.getElementById("add-btn").addEventListener("click", function () {
+    const wrapper = document.getElementById("gallery-wrapper");
+
+    const html = `
+      <div class="row gallery-item mt-3">
+        <div class="col-4">
+     
+          <input type="text" class="form-control" value="">
+        </div>
+
+        <div class="col-4">
+     
+          <input type="text" class="form-control" value="">
+        </div>
+
+        <div class="col-4 d-flex align-items-end">
+          <button class="btn btn-light delete-btn">Удалит</button>
+        </div>
+      </div>
+    `;
+    wrapper.insertAdjacentHTML("beforeend", html);
+  });
+
+  // Удалить tugma bosilganda o‘chirish
+  document.addEventListener("click", function (e) {
+    if (e.target.classList.contains("delete-btn")) {
+      e.target.closest(".gallery-item").remove();
+    }
+  });
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const addRowBtn = document.getElementById('add-row-btn');
+    const additionalRowsContainer = document.getElementById('additional-rows');
+    let rowCount = 1;
+
+    addRowBtn.addEventListener('click', function() {
+        rowCount++;
+        
+        const newRow = document.createElement('div');
+        newRow.className = 'row mb-3';
+        newRow.innerHTML = `
+            <div class="col-4">
+                <input type="text" class="form-control" id="АТХ-коды-${rowCount}" placeholder="АТХ коды">
+            </div>
+            <div class="col-4">
+                <input type="text" class="form-control" id="МКБ-10-${rowCount}" placeholder="МКБ-10 коды">
+            </div>   
+            <div class="col-4">
+                <input type="text" class="form-control" id="Возрастные-ограничения-${rowCount}" placeholder="Возрастные ограничения">
+            </div>
+        `;
+        
+        additionalRowsContainer.appendChild(newRow);
+    });
+});
+
+
+document.addEventListener('DOMContentLoaded', function() {
+  const buttons = document.querySelectorAll('.show-text');
+  const contents = document.querySelectorAll('.content-section');
+
+  buttons.forEach(button => {
+    button.addEventListener('click', function() {
+      const targetId = this.getAttribute('data-target');
+      
+      // Barcha tugmalarni reset qilish
+      buttons.forEach(btn => {
+        btn.classList.remove('btn-dark', 'active');
+        btn.classList.add('btn-outline-dark');
+      });
+      
+      // Barcha kontentlarni yashirish
+      contents.forEach(content => {
+        content.style.display = 'none';
+      });
+      
+      // Faqat tanlangan tugma va kontentni ko'rsatish
+      this.classList.remove('btn-outline-dark');
+      this.classList.add('btn-dark', 'active');
+      document.getElementById(targetId).style.display = 'block';
+    });
+  });
+});
+</script>
+
+
+</body>
+</html>
