@@ -14,7 +14,7 @@ SECRET_KEY = env.str('SECRET_KEY')
 TOKEN = env.str('TOKEN')
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
