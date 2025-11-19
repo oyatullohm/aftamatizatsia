@@ -96,12 +96,14 @@ class LoginView(APIView):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_ofisiant(request):
     chayhana = request.user.chayhana
     user = CustomUser.objects.filter(chayhana=chayhana)
     return Response(CustomUserSerializer(user).data)
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def ofisiant(request):
     active = request.data.get('active')
     id =  request.data.get('user_id')
