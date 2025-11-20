@@ -25,6 +25,7 @@ class Room(models.Model):
     name = models.CharField(max_length=100)
     price = models.DecimalField(max_digits=14, decimal_places=0)
     price_service = models.DecimalField(max_digits=14, decimal_places=0, default=0)
+    service_percentage = models.BooleanField(default=False)
     disciription = models.CharField(max_length=150, null=True, blank=True)
     def __str__(self):
         return self.name
@@ -112,6 +113,77 @@ class Order(models.Model): #buyurtma uchun
     def __str__(self):
         return f"Order {self.id}"
 
+    def calculate_service(self):
+        room = self.room
+
+        if room.service_percentage:
+            return (self.total_summa * room.price_service) / 100
+        else:
+            return room.price_service
+
+    
+    @property
+    def total_summa(self):
+    # 1) Buyurtma itemlari summasi
+        items_sum = sum(i.total for i in self.items.filter(cancel=False))
+
+        # 2) Xona summasi
+        room_price = self.room.price if self.room else 0
+
+        # 3) Servis hisoblash
+        if self.room:
+            if self.room.service_percentage:
+                # price_service = foiz masalan: 10 → %10
+                service_price = (room_price * self.room.price_service) / 100
+            else:
+                # Odatdagi summa
+                service_price = self.room.price_service
+        else:
+            service_price = 0
+
+        # Yakuniy summa
+        return items_sum + room_price + service_price
+    
+    @property
+    def receipt(self):
+        lines = []
+        lines.append("------ BUYURTMA CHEKI ------\n")
+
+        # Itemlar
+        for item in self.items.filter(cancel=False):
+            line = f"{item.menu_item.name} x {item.quantity} = {item.total:,}".replace(",", " ")
+            lines.append(line)
+
+        lines.append("\n-"*25)
+
+        # Xona narxi
+        room_price = self.room.price if self.room else 0
+        lines.append(f"Xona narxi: {room_price:,}".replace(",", " "))
+
+        # Servis
+        if self.room:
+            if self.room.service_percentage:
+                # Foiz
+                service_price = (room_price * self.room.price_service) / 100
+                lines.append(
+                    f"Servis ({self.room.price_service}%): {int(service_price):,}".replace(",", " ")
+                )
+            else:
+                # Oddiy summa
+                service_price = self.room.price_service
+                lines.append(
+                    f"Servis: {service_price:,}".replace(",", " ")
+                )
+        else:
+            service_price = 0
+
+        # Umumiy summa
+        total = self.total_summa
+        lines.append("-"*25)
+        lines.append(f"Umumiy summa: {int(total):,}".replace(",", " "))
+        lines.append("-"*25)
+
+        return "\n".join(lines)
 
 class OrderItem(models.Model):# buyurtma tarkibi
     chayhona = models.ForeignKey(Chayhana, on_delete=models.CASCADE)
@@ -120,12 +192,32 @@ class OrderItem(models.Model):# buyurtma tarkibi
     menu_item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
     quantity = models.DecimalField(max_digits=10, decimal_places=0, default=0)
     cancel = models.BooleanField(default=False)
+    
 
     @property
     def total(self):
         if self.cancel:
             return 0
-        summa = self.menu_item.sale_price * self.quantity
-        servise = self.order.room.price_service
-        room_sum = self.order.room.price
-        return summa + servise + room_sum
+        return self.menu_item.sale_price * self.quantity
+
+class IncomeUser(models.Model):
+    chayhona = models.ForeignKey(Chayhana, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    date = models.DateField(auto_now_add=True)
+    total_summa = models.DecimalField(max_digits=14, decimal_places=0, default=0)
+
+    def add_summa(self, amount):
+        self.total_summa += amount
+        self.save()
+    @property
+    def total_sum(self):
+        items = self.items.filter(cancel=False)
+        return sum([i.menu_item.sale_price * i.quantity for i in items])
+
+class IncomeItemUser(models.Model):
+    income = models.ForeignKey(IncomeUser, on_delete=models.CASCADE)
+    order = models.OneToOneField(Order, on_delete=models.CASCADE)
+    summa = models.DecimalField(max_digits=14, decimal_places=0)  # faqat shu orderdan service puli
+
+    
+    

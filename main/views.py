@@ -135,13 +135,6 @@ def chayhana(request):
     }
     return Response(data)
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def afisttant(request):
-    afisttants = Afisttant.objects.filter(chayhana=request.user.chayhana)
-    data = [{'id': afisttant.id, 'name': afisttant.name, 'role': afisttant.role, 'telegram_id': afisttant.telegram_id} for afisttant in afisttants]
-    return Response(data)
-
 
 
 @api_view(['GET'])

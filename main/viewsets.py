@@ -9,6 +9,7 @@ from django.db.models import Q
 from django.utils import timezone
 from rest_framework import status
 from .utlis import print_kitchen_check
+from datetime import date
 
 class RoomViewset(ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -23,10 +24,14 @@ class RoomViewset(ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         rom = self.get_queryset().get(id=kwargs['pk'])
         return Response(RoomSerializer(rom).data)
+    
     def update(self, request, *args, **kwargs):
         room = self.get_queryset().get(id=kwargs['pk'])
         name = request.data.get('name')
         price = request.data.get('price')
+        price_service = request.data.get('price_service')
+        service_percentage = request.data.get('service_percentage')
+        
         disciription = request.data.get('disciription')
         if name:
             room.name = name
@@ -34,6 +39,10 @@ class RoomViewset(ModelViewSet):
             room.price = price
         if disciription:
             room.disciription = disciription
+        if service_percentage:
+            room.service_percentage = bool(service_percentage)
+        if price_service:
+            room.price_service = price_service
         room.save()
         return Response(RoomSerializer(room).data)
         
@@ -42,13 +51,17 @@ class RoomViewset(ModelViewSet):
         chayhana = request.user.chayhana
         name = request.data.get('name')
         price = request.data.get('price')
+        price_service = request.data.get('price_service')
+        service_percentage = request.data.get('service_percentage')
         disciription = request.data.get('disciription')
- 
+       
         room = Room.objects.create(
             chayhana= chayhana,
             name=name,
             price=price,
-            disciription=disciription
+            disciription=disciription,
+            service_percentage=service_percentage,
+            price_service=price_service
         ) 
         serializers = RoomSerializer(room )
         return Response(serializers.data)
@@ -437,12 +450,62 @@ class OrderViewset(ModelViewSet):
         })
 
     @action(detail=True, methods=['post'])
+    def finished(self, request, pk=None):
+        order = self.get_queryset().get(id=pk)
+
+        # 1) Afitsiantni aniqlash (bir order uchun bitta bo'ladi deb hisob qilamiz)
+        item = order.items.filter(cancel=False).first()
+        if not item or not item.afisttyant:
+            return Response({"error": "Afitsiant topilmadi."}, status=400)
+
+        user = item.afisttyant
+
+        # 2) Orderni tugatamiz
+        order.finished = True
+        order.save()
+
+        # 3) Afitsiant uchun kunlik IncomeUser (agar mavjud bo'lmasa — yaratamiz)
+        today = date.today()
+        income_user, created = IncomeUser.objects.get_or_create(
+            chayhona=order.chayhona,
+            user=user,
+            date=today,
+        )
+
+        # 4) Orderdan keladigan service pulini hisoblaymiz
+        service_sum = order.calculate_service()
+
+        # 5) IncomeItemUser (agar oldin yaratilmagan bo‘lsa) yaratamiz
+        income_item, created = IncomeItemUser.objects.get_or_create(
+            income=income_user,
+            order=order,
+            defaults={"summa": service_sum}
+        )
+
+        # 6) Kunlik jami summaga qo‘shamiz (faqat yangi bo‘lsa)
+        if created:
+            income_user.add_summa(service_sum)
+
+        return Response({
+            "success": True,
+            "service_sum": service_sum,
+            "income_user_total": income_user.total_summa,
+            "message": "Order yakunlandi va service hisoblandi"
+        })
+
+            
+    @action(detail=True, methods=['post'])
     def cancel(self,request, pk=None):
         order = self.get_queryset().get(id=pk)
         order.cancel = True
         order.finished = True
         order.save()
 
+        return Response({
+            "success":True
+        })
+
+        
     def destroy(self, request, *args, **kwargs):
         return Response({
             "success":False
