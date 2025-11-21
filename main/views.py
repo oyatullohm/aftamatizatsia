@@ -112,7 +112,7 @@ def ofisiant(request):
     user.save()
     return Response({
            'success':True
-        }, status=status)
+        })
 
 
 # @login_required
