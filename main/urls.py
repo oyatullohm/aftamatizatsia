@@ -20,7 +20,7 @@ urlpatterns = [
    path('login/',LoginView.as_view(), name='login'),
    path('category/', category, name='category'),
    path('chayhana/', chayhana, name='chayhana'),
-   path('afisttant/', afisttant, name='afisttant'),
+   # path('afisttant/', afisttant, name='afisttant'),
    path('free-rooms/', free_rooms, name='free_rooms'),
    path('room-busy-dates/', room_busy_dates, name='room_busy_dates'),
    
