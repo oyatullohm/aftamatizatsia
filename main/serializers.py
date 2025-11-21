@@ -58,4 +58,4 @@ class KitchenDepartmentSerializer(serializers.ModelSerializer):
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['username','phone', "is_active"]
+        fields = [ 'id', 'username','phone', "is_active"]
