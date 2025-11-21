@@ -111,7 +111,8 @@ def ofisiant(request):
     user.is_active = bool(active)
     user.save()
     return Response({
-           'success':True
+           'success':True,
+           'active':user.is_active 
         })
 
 
