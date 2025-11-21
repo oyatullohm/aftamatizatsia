@@ -102,7 +102,7 @@ def get_ofisiant(request):
     user = CustomUser.objects.filter(chayhana=chayhana)
     return Response(CustomUserSerializer(user, many = True).data)
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def ofisiant(request):
     active = request.data.get('active')
