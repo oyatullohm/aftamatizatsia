@@ -11,6 +11,46 @@ from rest_framework import status
 from .utlis import print_kitchen_check
 from datetime import date
 
+class CategoryViewset(ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        return Category.objects.filter(chayhana=self.request.user.chayhana)
+    
+    def list(self, request, *args, **kwargs):
+        serializers = CategorySerializer(self.get_queryset(),many= True)
+        return Response(serializers.data)
+    
+    def retrieve(self, request, *args, **kwargs):
+        category = self.get_queryset().get(id=kwargs['pk'])
+        return Response(CategorySerializer(category).data)
+    
+    def update(self, request, *args, **kwargs):
+        category = self.get_queryset().get(id=kwargs['pk'])
+        name = request.data.get('name')
+        if name:
+            category.name = name
+        category.save()
+        return Response(CategorySerializer(category).data)
+        
+    
+    def create(self, request, *args, **kwargs):
+        chayhana = request.user.chayhana
+        name = request.data.get('name')
+       
+        category = Category.objects.create(
+            chayhana= chayhana,
+            name=name,
+           
+        ) 
+        serializers = CategorySerializer(category )
+        return Response(serializers.data)
+
+
+    def destroy(self, request, *args, **kwargs):
+        self.get_queryset().get(id=kwargs['pk']).delete()
+        return Response({'sucsess':True})
+
 class RoomViewset(ModelViewSet):
     permission_classes = [IsAuthenticated]
     
@@ -122,15 +162,9 @@ class ProductViewset(ModelViewSet):
         serializers = ProductSerializer(product )
         return Response(serializers.data)
 
-
     def destroy(self, request, *args, **kwargs):
         self.get_queryset().get(id=kwargs['pk']).delete()
         return Response({'sucsess':True})
-
-    def destroy(self, request, *args, **kwargs):
-        client = self.get_queryset().get(id=kwargs['pk'])
-        client.delete()
-        return Response({'success':True})
             
 class IncomeProductViewset(ModelViewSet):
     permission_classes = [IsAuthenticated]

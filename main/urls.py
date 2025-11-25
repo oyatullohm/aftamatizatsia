@@ -7,11 +7,11 @@ router = DefaultRouter()
 
 router.register(r'room', RoomViewset, basename='room')
 router.register(r'product', ProductViewset, basename='product')
-# router.register(r'client', ClientViewset, basename='client')
 router.register(r'menu', MenuItemViewset, basename='menu')
 router.register(r'income', IncomeProductViewset, basename='income')
 router.register(r'order', OrderViewset, basename='order')
 router.register(r'item', OrderItemViewset, basename='item')
+router.register(r'category',CategoryViewset, basename='categoyy')
 
 urlpatterns = [
    path('register/', RegisterView.as_view(), name='register'),
@@ -19,7 +19,8 @@ urlpatterns = [
    path('get-ofisiant/', get_ofisiant, name='hodimlar'),
    path('ofisiant/', ofisiant, name='hodim'),
    path('login/',LoginView.as_view(), name='login'),
-   path('category/', category, name='category'),
+   
+   # path('category/', category, name='category'),
    path('chayhana/', chayhana, name='chayhana'),
    # path('afisttant/', afisttant, name='afisttant'),
    path('free-rooms/', free_rooms, name='free_rooms'),

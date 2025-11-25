@@ -116,13 +116,13 @@ def ofisiant(request):
         })
 
 
-# @login_required
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def category(request):
-    categories = Category.objects.filter(chayhana=request.user.chayhana)
-    data = [{'id': category.id, 'name': category.name} for category in categories]
-    return Response(data)
+# # @login_required
+# @api_view(['GET'])
+# @permission_classes([IsAuthenticated])
+# def category(request):
+#     categories = Category.objects.filter(chayhana=request.user.chayhana)
+#     data = [{'id': category.id, 'name': category.name} for category in categories]
+#     return Response(data)
 
 
 @api_view(['GET'])
