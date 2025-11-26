@@ -341,6 +341,56 @@ class MenuItemViewset(ModelViewSet):
             menu_item.save()
         return Response(MenuItemSerializer(menu_item).data)
 
+
+class DailyMenuPlanViewset(ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        return DailyMenuPlan.objects.filter(chayhana=self.request.user.chayhana).select_related('chayhana','menu_item')
+    
+    def list(self, request, *args, **kwargs):
+        serializers = DailyMenuPlanSerializer(self.get_queryset(),many= True)
+        return Response(serializers.data) 
+    
+    def create(self, request, *args, **kwargs):
+        chayhana = request.user.chayhana
+        menu_item_id = request.data.get('menu_item_id')
+        date = request.data.get('date')
+        count = request.data.get('count')
+       
+        daily_menu_plan = DailyMenuPlan.objects.create(
+            chayhana= chayhana,
+            menu_item_id=menu_item_id,
+            date=date,
+            count=count
+        )
+        
+        serializers = DailyMenuPlanSerializer(daily_menu_plan )
+        return Response(serializers.data) 
+    
+    def destroy(self, request, *args, **kwargs):
+        self.get_queryset().get(id=kwargs['pk']).delete()
+        return Response({'sucsess':True}) 
+    
+    
+    def retrieve(self, request, *args, **kwargs):
+        daily_menu_plan = self.get_queryset().get(id=kwargs['pk'])
+        return Response(DailyMenuPlanSerializer(daily_menu_plan).data)
+    
+    def update(self, request, *args, **kwargs):
+        daily_menu_plan = self.get_queryset().get(id=kwargs['pk'])
+        is_active = request.data.get('is_active')
+        date = request.data.get('date')
+        count = request.data.get('count')
+        if is_active is not None:
+            daily_menu_plan.is_active = bool(is_active)
+        if date :
+            daily_menu_plan.date = date
+        if count:
+            daily_menu_plan.count = count
+        daily_menu_plan.save()
+        return Response(DailyMenuPlanSerializer(daily_menu_plan).data)
+
 class OrderViewset(ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = OrderSerializer

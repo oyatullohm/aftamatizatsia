@@ -64,3 +64,8 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = '__all__'
+
+class DailyMenuPlanSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DailyMenuPlan
+        fields = '__all__'

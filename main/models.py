@@ -91,11 +91,15 @@ class MenuItem(models.Model): # menyu uchun
     def __str__(self):
         return self.name
 
+class DailyMenuPlan(models.Model):
+    chayhana = models.ForeignKey(Chayhana, on_delete=models.CASCADE)
+    menu_item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
+    date = models.DateField(auto_now_add=False)
+    count = models.DecimalField(max_digits=14, decimal_places=0)
+    is_active = models.BooleanField(default=True)
+    class Meta:
+        unique_together = ('menu_item', 'date')  # bir kunda bir mahsulot uchun faqat 1 record
 
-
-
-    def __str__(self):
-        return f"{self.name} - {self.role}"
 
 class Order(models.Model): #buyurtma uchun
     chayhona = models.ForeignKey(Chayhana, on_delete=models.CASCADE)
