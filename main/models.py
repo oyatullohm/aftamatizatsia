@@ -17,6 +17,7 @@ class Chayhana(models.Model):
 class CustomUser(AbstractUser):
     chayhana = models.ForeignKey(Chayhana, on_delete=models.CASCADE,null=True,blank=True) 
     phone = models.CharField(max_length=13)
+    role = models.CharField(max_length=50, default='ofisiant')  # ofisiant, admin, oshpaz, boshqaruvchi
     def __str__(self):
         return f"{self.username}"
 
@@ -80,7 +81,11 @@ class MenuItem(models.Model): # menyu uchun
     image = models.ImageField(upload_to='menu_items/', null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     ingredients = models.JSONField(default=list)#[{"id": 1, "quantity": 2}, {"id": 3, "quantity": 0.5}]
+    count = models.DecimalField(max_digits=14, decimal_places=0, default=0)  # nechtaligini kuzatish uchun
+    auto_count = models.BooleanField(default=False) 
     is_active = models.BooleanField(default=True)
+    is_rejected = models.BooleanField(default=False)
+    reason_reject = models.CharField(max_length=255, null=True, blank=True)
     kitchen = models.ForeignKey(
         KitchenDepartment,
         on_delete=models.SET_NULL,
@@ -90,16 +95,6 @@ class MenuItem(models.Model): # menyu uchun
     )
     def __str__(self):
         return self.name
-
-class DailyMenuPlan(models.Model):
-    chayhana = models.ForeignKey(Chayhana, on_delete=models.CASCADE)
-    menu_item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
-    date = models.DateField(auto_now_add=False)
-    count = models.DecimalField(max_digits=14, decimal_places=0)
-    is_active = models.BooleanField(default=True)
-    class Meta:
-        unique_together = ('menu_item', 'date')  # bir kunda bir mahsulot uchun faqat 1 record
-
 
 class Order(models.Model): #buyurtma uchun
     chayhona = models.ForeignKey(Chayhana, on_delete=models.CASCADE)

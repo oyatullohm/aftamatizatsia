@@ -191,6 +191,18 @@ class IncomeProductViewset(ModelViewSet):
             count=count
         )
         
+        menu_items = MenuItem.objects.filter(
+        chayhana=chayhana,
+        name__iexact=product.name,
+        auto_count=True
+        )
+
+        for item in menu_items:
+            item.count += int(count)
+            item.save()
+
+
+        
         serializers = IncomeProductSerializer(income_product )
         return Response(serializers.data) 
     
@@ -199,21 +211,41 @@ class IncomeProductViewset(ModelViewSet):
         product = income_product.product
         product.count -= income_product.count
         product.save()
+        menu_items = MenuItem.objects.filter(
+        chayhana=self.user.chayhana,
+        name__iexact=product.name,
+        auto_count=True
+        )
+        for i in menu_items:
+            i.count-=income_product.count()
+            i.save()
+        
         income_product.delete()
         return Response({'sucsess':True}) 
+    
     def retrieve(self, request, *args, **kwargs):
         income_product = self.get_queryset().get(id=kwargs['pk'])
         return Response(IncomeProductSerializer(income_product).data)
+    
     def update(self, request, *args, **kwargs):
         income_product = self.get_queryset().get(id=kwargs['pk'])
         price = request.data.get('price')
         count = request.data.get('count')
         product = income_product.product
+        menu_items = MenuItem.objects.filter(
+        chayhana=request.user.chayhana,
+        name__iexact=product.name,
+        auto_count=True
+        )
         if count:
             product.count -= income_product.count
             product.count += int(count)
             income_product.count = count
             product.save()
+            for m in menu_items:
+                m.count -= income_product.count
+                m.count += int(count)
+                m.save()
         if price:
             income_product.price = price
         income_product.save()
@@ -229,7 +261,7 @@ class MenuItemViewset(ModelViewSet):
         queryset = self.get_queryset()
         if category_id:
             queryset =queryset.filter( category_id=category_id)
-        serializers = MenuItemSerializer(queryset,many= True)
+        serializers = MenuItemAdminSerializer(queryset,many= True)
         return Response(serializers.data)
     
     @action(detail=False, methods=['get'])
@@ -262,6 +294,9 @@ class MenuItemViewset(ModelViewSet):
     
     @action(detail=True, methods=['post'])
     def ingredients_add(self, request, pk=None):
+        """
+        bu funsiya 
+        """
         menu_item = self.get_queryset().get(id=pk)
         data = request.data.get('ingredients', [])
         menu_item.ingredients = data
@@ -304,8 +339,8 @@ class MenuItemViewset(ModelViewSet):
         name = request.data.get('name')
         sale_price = request.data.get('sale_price')
         category_id = request.data.get('category_id')
+        auto_count = request.data.get('auto_count')
         image = request.data.get('image')
-        is_active = request.data.get('is_active')
         kitchen_id = request.data.get('kitchen_id')
         if name:
             menu_item.name = name
@@ -317,8 +352,8 @@ class MenuItemViewset(ModelViewSet):
             if menu_item.image:
                 menu_item.image.delete()
             menu_item.image = image
-        if is_active:
-            menu_item.is_active = bool(is_active)
+        if auto_count:
+            menu_item.auto_count = bool(auto_count)
             
         if kitchen_id:
             menu_item.kitchen_id= kitchen_id
@@ -340,56 +375,6 @@ class MenuItemViewset(ModelViewSet):
             menu_item.is_active = bool(is_active)
             menu_item.save()
         return Response(MenuItemSerializer(menu_item).data)
-
-
-class DailyMenuPlanViewset(ModelViewSet):
-    permission_classes = [IsAuthenticated]
-    
-    def get_queryset(self):
-        return DailyMenuPlan.objects.filter(chayhana=self.request.user.chayhana).select_related('chayhana','menu_item')
-    
-    def list(self, request, *args, **kwargs):
-        serializers = DailyMenuPlanSerializer(self.get_queryset(),many= True)
-        return Response(serializers.data) 
-    
-    def create(self, request, *args, **kwargs):
-        chayhana = request.user.chayhana
-        menu_item_id = request.data.get('menu_item_id')
-        date = request.data.get('date')
-        count = request.data.get('count')
-       
-        daily_menu_plan = DailyMenuPlan.objects.create(
-            chayhana= chayhana,
-            menu_item_id=menu_item_id,
-            date=date,
-            count=count
-        )
-        
-        serializers = DailyMenuPlanSerializer(daily_menu_plan )
-        return Response(serializers.data) 
-    
-    def destroy(self, request, *args, **kwargs):
-        self.get_queryset().get(id=kwargs['pk']).delete()
-        return Response({'sucsess':True}) 
-    
-    
-    def retrieve(self, request, *args, **kwargs):
-        daily_menu_plan = self.get_queryset().get(id=kwargs['pk'])
-        return Response(DailyMenuPlanSerializer(daily_menu_plan).data)
-    
-    def update(self, request, *args, **kwargs):
-        daily_menu_plan = self.get_queryset().get(id=kwargs['pk'])
-        is_active = request.data.get('is_active')
-        date = request.data.get('date')
-        count = request.data.get('count')
-        if is_active is not None:
-            daily_menu_plan.is_active = bool(is_active)
-        if date :
-            daily_menu_plan.date = date
-        if count:
-            daily_menu_plan.count = count
-        daily_menu_plan.save()
-        return Response(DailyMenuPlanSerializer(daily_menu_plan).data)
 
 class OrderViewset(ModelViewSet):
     permission_classes = [IsAuthenticated]

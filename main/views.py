@@ -23,8 +23,8 @@ class RegisterView(APIView):
             return Response({'phone': 'Bu telefon raqam allaqachon ro‘yxatdan o‘tgan.'}, status=status.HTTP_400_BAD_REQUEST)
         user = CustomUser.objects.create_user(username=data['username'],
                                               password=data['password'],
-                                              phone=data['phone'])
-            
+                                              phone=data['phone'],
+                                             role='admin')             
         cayhana = Chayhana.objects.create(name=data.get('name'))
         Category.objects.bulk_create([
             Category(chayhana=cayhana, name="Taomlar"),
@@ -47,7 +47,6 @@ class RegisterView(APIView):
             }
         }, status=status.HTTP_201_CREATED)
         
- 
 class AfisttyantRegisterView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request):
@@ -99,7 +98,7 @@ class LoginView(APIView):
 @permission_classes([IsAuthenticated])
 def get_ofisiant(request):
     chayhana = request.user.chayhana
-    user = CustomUser.objects.filter(chayhana=chayhana)
+    user = CustomUser.objects.filter(chayhana=chayhana, role='ofisiant')
     return Response(CustomUserSerializer(user, many = True).data)
 
 @api_view(['POST'])
@@ -114,15 +113,6 @@ def ofisiant(request):
            'success':True,
            'active':user.is_active 
         })
-
-
-# # @login_required
-# @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
-# def category(request):
-#     categories = Category.objects.filter(chayhana=request.user.chayhana)
-#     data = [{'id': category.id, 'name': category.name} for category in categories]
-#     return Response(data)
 
 
 @api_view(['GET'])

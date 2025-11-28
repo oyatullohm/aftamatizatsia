@@ -12,7 +12,7 @@ router.register(r'income', IncomeProductViewset, basename='income')
 router.register(r'order', OrderViewset, basename='order')
 router.register(r'item', OrderItemViewset, basename='item')
 router.register(r'category',CategoryViewset, basename='categoyy')
-router.register(r'planmenue',DailyMenuPlanViewset, basename='planmenue')
+
 
 urlpatterns = [
    path('register/', RegisterView.as_view(), name='register'),

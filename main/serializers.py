@@ -17,11 +17,6 @@ class ProductSerializer(serializers.ModelSerializer):
     def get_total_value(self, obj):
         return obj.total_value
 
-# class ClientSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Client
-#         fields = '__all__'
-        # depth = True
 
 class IncomeProductSerializer(serializers.ModelSerializer):
     class Meta:
@@ -32,6 +27,27 @@ class MenuItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = MenuItem
         fields = "__all__"
+
+class MenuItemAdminSerializer(serializers.ModelSerializer):
+    ingredients = serializers.SerializerMethodField()
+    class Meta:
+        model = MenuItem
+        fields = "__all__"
+    
+    def get_ingredients(self, obj):
+        result = []
+        for item in obj.ingredients:
+            try:
+                product = Product.objects.get(id=item["id"])
+                result.append({
+                    "id": item["id"],
+                    "name": product.name,
+                    "unit": product.unit,
+                    "count": item["quantity"]
+                })
+            except Product.DoesNotExist:
+                result.append(item)
+        return result
 
 class OrderSerializer(serializers.ModelSerializer):
     created_at = serializers.SerializerMethodField()
@@ -65,7 +81,3 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = '__all__'
 
-class DailyMenuPlanSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = DailyMenuPlan
-        fields = '__all__'
