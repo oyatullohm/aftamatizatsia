@@ -389,8 +389,8 @@ class OrderViewset(ModelViewSet):
             'chayhona','room'
         ).prefetch_related('items')
     
-    @action(detail=True, methods=['get'])
     @permission_classes([AllowAny])
+    @action(detail=True, methods=['get'])
     def summa(self, request, pk=None):
         order = Order.objects.get(id=pk)
         return Response({"total_summa": order.total_summa})
