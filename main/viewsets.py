@@ -10,6 +10,7 @@ from django.utils import timezone
 from rest_framework import status
 from .utlis import print_kitchen_check
 from datetime import date
+from rest_framework.generics import get_object_or_404
 
 
 class CategoryViewset(ModelViewSet):
@@ -389,10 +390,10 @@ class OrderViewset(ModelViewSet):
             'chayhona','room'
         ).prefetch_related('items')
     
-    @permission_classes([AllowAny])
     @action(detail=True, methods=['get'])
+    @permission_classes([AllowAny])  # Bu yerda faqat action uchun permission
     def summa(self, request, pk=None):
-        order = Order.objects.get(id=pk)
+        order = get_object_or_404(Order, id=pk)
         return Response({"total_summa": order.total_summa})
     
     def list(self, request, *args, **kwargs):
