@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+
+    <script>
+const departmentId = 1; // misol uchun oshxona bo‘limining ID si
+const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
+const wsUrl = `${wsProtocol}://${window.location.host}/ws/printer/${departmentId}/`;
+
+const socket = new WebSocket(wsUrl);
+
+socket.onopen = function(e) {
+    console.log("WebSocket connected");
+};
+
+socket.onmessage = function(event) {
+    const data = JSON.parse(event.data);
+    console.log("New order:", data);
+    // shu yerda UI ga yangi buyurtmani ko‘rsatish yoki chop etish tugmasini ko‘rsatish mumkin
+};
+
+socket.onclose = function(e) {
+    console.log("WebSocket closed, reconnecting in 3 seconds...");
+    setTimeout(() => {
+        // reconnect logikasi
+        connectWebSocket();
+    }, 3000);
+};
+
+socket.onerror = function(error) {
+    console.error("WebSocket error:", error);
+};
+
+    </script>
+</body>
+
+</html>

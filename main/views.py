@@ -197,4 +197,58 @@ def room_busy_dates(request):
 
     return Response(OrderSerializer(orders, many=True).data)
 
+class MobileCreateOrderView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = MobileCreateOrderSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+
+        chayhona = request.user.chayhona
+        afisttyant = request.user  # mobil foydalanuvchi — afitsiyant
+
+        room = None
+        if data.get("room_id"):
+            room = Room.objects.filter(
+                id=data["room_id"],
+                chayhana=chayhona
+            ).first()
+
+            if not room:
+                return Response({"error": "Room topilmadi"}, status=404)
+
+        order = Order.objects.create(
+            chayhona=chayhona,
+            client_name=data.get("client_name", ""),
+            phone=data.get("phone", ""),
+            room=room
+        )
+
+        for item in data["items"]:
+            try:
+                menu = MenuItem.objects.get(
+                    id=item["menu_id"],
+                    chayhana=chayhona,
+                    is_active=True,
+                    is_rejected=False
+                )
+            except MenuItem.DoesNotExist:
+                return Response({"error": f"Menu item {item['menu_id']} topilmadi"}, status=404)
+
+            OrderItem.objects.create(
+                chayhona=chayhona,
+                afisttyant=afisttyant,
+                order=order,
+                menu_item=menu,
+                quantity=item["quantity"]
+            )
+
+        return Response({
+            "success": True,
+            "order_id": order.id,
+            "room": room.name if room else None,
+            "message": "Buyurtma muvaffaqiyatli yaratildi"
+        }, status=201)
+
 

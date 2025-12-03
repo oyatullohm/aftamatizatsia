@@ -81,3 +81,23 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = '__all__'
 
+class KassaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Kassa
+        fields = '__all__'
+
+class CostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cost
+        fields = '__all__'
+        
+        
+class MobileOrderItemSerializer(serializers.Serializer):
+    menu_id = serializers.IntegerField()
+    quantity = serializers.IntegerField()
+
+class MobileCreateOrderSerializer(serializers.Serializer):
+    client_name = serializers.CharField(required=False, allow_blank=True)
+    phone = serializers.CharField(required=False, allow_blank=True)
+    room_id = serializers.IntegerField(required=False, allow_null=True)
+    items = MobileOrderItemSerializer(many=True)

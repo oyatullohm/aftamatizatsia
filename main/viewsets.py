@@ -1,15 +1,16 @@
 
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import  IsAuthenticated
+from rest_framework.permissions import  IsAuthenticated , AllowAny
 from .serializers import *
 from rest_framework.response import Response
-from rest_framework.decorators import action
+from rest_framework.decorators import action, permission_classes
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
 from django.utils import timezone
 from rest_framework import status
 from .utlis import print_kitchen_check
 from datetime import date
+
 
 class CategoryViewset(ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -295,7 +296,9 @@ class MenuItemViewset(ModelViewSet):
     @action(detail=True, methods=['post'])
     def ingredients_add(self, request, pk=None):
         """
-        bu funsiya 
+        bu funsiya menu item ga ingredient larni qo'shish uchun ishlatiladi
+        request data da ingredients list ko'rinishida bo'ladi:
+        [{"id": 1, "quantity": 2}, {"id": 3, "quantity": 0.5}]  
         """
         menu_item = self.get_queryset().get(id=pk)
         data = request.data.get('ingredients', [])
@@ -339,6 +342,7 @@ class MenuItemViewset(ModelViewSet):
         name = request.data.get('name')
         sale_price = request.data.get('sale_price')
         category_id = request.data.get('category_id')
+        count = request.data.get('count')
         auto_count = request.data.get('auto_count')
         image = request.data.get('image')
         kitchen_id = request.data.get('kitchen_id')
@@ -354,7 +358,8 @@ class MenuItemViewset(ModelViewSet):
             menu_item.image = image
         if auto_count:
             menu_item.auto_count = bool(auto_count)
-            
+        if count:
+            menu_item.count = count
         if kitchen_id:
             menu_item.kitchen_id= kitchen_id
         menu_item.save()
@@ -383,6 +388,12 @@ class OrderViewset(ModelViewSet):
         return Order.objects.filter(chayhona=self.request.user.chayhona, finished=False).select_related(
             'chayhona','room'
         ).prefetch_related('items')
+    
+    @action(detail=True, methods=['get'])
+    @permission_classes([AllowAny])
+    def summa(self, request, pk=None):
+        order = Order.objects.get(id=pk)
+        return Response({"total_summa": order.total_summa})
     
     def list(self, request, *args, **kwargs):
         qs = self.get_queryset()
@@ -520,20 +531,24 @@ class OrderViewset(ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def finished(self, request, pk=None):
+        payments = request.data.get('payments', [])   # bir nechta to‘lov
+        
+        if not payments:
+            return Response({"error": "Payments bo‘sh bo‘lishi mumkin emas"}, status=400)
+
         order = self.get_queryset().get(id=pk)
 
-        # 1) Afitsiantni aniqlash (bir order uchun bitta bo'ladi deb hisob qilamiz)
+        # Afitsiantni aniqlaymiz
         item = order.items.filter(cancel=False).first()
         if not item or not item.afisttyant:
             return Response({"error": "Afitsiant topilmadi."}, status=400)
-
         user = item.afisttyant
 
-        # 2) Orderni tugatamiz
+        # Orderni tugatamiz
         order.finished = True
         order.save()
 
-        # 3) Afitsiant uchun kunlik IncomeUser (agar mavjud bo'lmasa — yaratamiz)
+        # IncomeUser
         today = date.today()
         income_user, created = IncomeUser.objects.get_or_create(
             chayhona=order.chayhona,
@@ -541,25 +556,45 @@ class OrderViewset(ModelViewSet):
             date=today,
         )
 
-        # 4) Orderdan keladigan service pulini hisoblaymiz
+        # Service hisoblash
         service_sum = order.calculate_service()
 
-        # 5) IncomeItemUser (agar oldin yaratilmagan bo‘lsa) yaratamiz
+        # IncomeItemUser
         income_item, created = IncomeItemUser.objects.get_or_create(
             income=income_user,
             order=order,
             defaults={"summa": service_sum}
         )
 
-        # 6) Kunlik jami summaga qo‘shamiz (faqat yangi bo‘lsa)
         if created:
             income_user.add_summa(service_sum)
 
+        # 🔥 Kassa bo‘yicha to‘lovlarni qo‘shish
+        total_payment = 0
+
+        for p in payments:
+            kassa_id = p.get('kassa_id')
+            summa = p.get('summa')
+
+            if not kassa_id or not summa:
+                return Response({"error": "Har bir paymentda kassa_id va summa bo‘lishi kerak"}, status=400)
+
+            try:
+                kassa = Kassa.objects.get(id=kassa_id)
+            except Kassa.DoesNotExist:
+                return Response({"error": f"Kassa topilmadi: {kassa_id}"}, status=404)
+
+            kassa.balance += summa
+            kassa.save()
+            total_payment += summa
+
         return Response({
             "success": True,
+            "order_total": order.total_summa,
+            "paid_sum": total_payment,
             "service_sum": service_sum,
             "income_user_total": income_user.total_summa,
-            "message": "Order yakunlandi va service hisoblandi"
+            "message": "Order yakunlandi va to‘lovlar bir nechta kassaga bo‘lindi"
         })
 
             
@@ -651,7 +686,35 @@ class OrderItemViewset(ModelViewSet):
         return Response({
             OrderItemSerializer(item).data
         })
-         
+    
+    def update(self, request, order_id, pk):
+        data = request.data
+        quantity = data.get('quantity')
+        item = self.get_queryset(order_id).get(id=pk)
+        if quantity:
+            # qancha o'zgardi
+            added_quantity = int(quantity) - item.quantity
+            item.quantity = int(quantity)
+            item.save()
+
+            # 🔥 Omborni yangilash (minus qilish)
+            menu_item = item.menu_item
+
+            for ingredient in menu_item.ingredients:
+                product_id = ingredient.get("id")
+                konsum = ingredient.get("quantity")   # 1 porsiya uchun sarf
+
+                try:
+                    product = Product.objects.get(id=product_id, chayhona=request.user.chayhona)
+                except Product.DoesNotExist:
+                    continue  # Product topilmasa skip
+
+                minus_amount = konsum * added_quantity
+                product.count -= minus_amount
+                product.save()
+        return Response({
+            OrderItemSerializer(item).data
+        }) 
     @action(detail=True,methods=['post'])
     def cancel(self,request, order_id, pk):
         item = self.get_queryset(order_id).get(id=pk)
@@ -723,6 +786,100 @@ class KitchenDepartmentViewset(ModelViewSet):
             printer_port = printer_port
         )
         return Response(KitchenDepartmentSerializer(printer).data)
+    
+    def destroy(self, request, *args, **kwargs):
+        self.get_queryset().get(id=kwargs['pk']).delete()
+        return Response({
+            'success':True
+        })
+
+class KassaViewset(ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        return Kassa.objects.filter(chayhona=self.request.user.chayhana)
+    
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        return Response({
+            KassaSerializer(queryset, many=True).data
+        })
+    
+    def retrieve(self, request, *args, **kwargs):
+        kassa = self.get_queryset().get(id=kwargs['pk'])
+        return Response(KassaSerializer(kassa).data)
+    
+    def update(self, request, *args, **kwargs):
+        data = request.data
+        name = data.get('name')
+        initial_amount = data.get('initial_amount')
+        kassa = self.get_queryset().get(id=kwargs['pk'])
+        
+        if name:
+            kassa.name = name
+        if initial_amount:
+            kassa.initial_amount = initial_amount
+        kassa.save()
+        
+        return Response(KassaSerializer(kassa).data)
+    
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        name = data.get('name')
+        initial_amount = data.get('initial_amount')
+        kassa =  Kassa.objects.create(
+            chayhona = request.user.chayhana,
+            name = name,
+            initial_amount = initial_amount
+        )
+        return Response(KassaSerializer(kassa).data)
+    
+    def destroy(self, request, *args, **kwargs):
+        self.get_queryset().get(id=kwargs['pk']).delete()
+        return Response({
+            'success':True
+        }) 
+
+class CostViewset(ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        return Cost.objects.filter(chayhona=self.request.user.chayhana)
+    
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        return Response({
+            CostSerializer(queryset, many=True).data
+        })
+    
+    def retrieve(self, request, *args, **kwargs):
+        cost = self.get_queryset().get(id=kwargs['pk'])
+        return Response(CostSerializer(cost).data)
+    
+    def update(self, request, *args, **kwargs):
+        data = request.data
+        name = data.get('name')
+        amount = data.get('amount')
+        cost = self.get_queryset().get(id=kwargs['pk'])
+        
+        if name:
+            cost.name = name
+        if amount:
+            cost.amount = amount
+        cost.save()
+        
+        return Response(CostSerializer(cost).data)
+    
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        name = data.get('name')
+        amount = data.get('amount')
+        cost =  Cost.objects.create(
+            chayhona = request.user.chayhana,
+            name = name,
+            amount = amount
+        )
+        return Response(CostSerializer(cost).data)
     
     def destroy(self, request, *args, **kwargs):
         self.get_queryset().get(id=kwargs['pk']).delete()

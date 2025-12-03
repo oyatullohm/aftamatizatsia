@@ -98,7 +98,6 @@ class MenuItem(models.Model): # menyu uchun
 
 class Order(models.Model): #buyurtma uchun
     chayhona = models.ForeignKey(Chayhana, on_delete=models.CASCADE)
-    # customer = models.ForeignKey(Client, on_delete=models.CASCADE, null=True, blank=True)
     client_name = models.CharField(max_length=100, default='', blank=True)
     phone = models.CharField(max_length=15, default='', blank=True)
     room = models.ForeignKey(Room, on_delete=models.CASCADE, null=True, blank=True)
@@ -218,5 +217,15 @@ class IncomeItemUser(models.Model):
     order = models.OneToOneField(Order, on_delete=models.CASCADE)
     summa = models.DecimalField(max_digits=14, decimal_places=0)  # faqat shu orderdan service puli
 
-    
-    
+class Kassa(models.Model):
+    chayhona = models.ForeignKey(Chayhana, on_delete=models.CASCADE)
+    date = models.DateField(auto_now_add=True)
+    balance = models.DecimalField(max_digits=14, decimal_places=0, default=0)
+
+class Cost(models.Model):
+    chayhona = models.ForeignKey(Chayhana, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    amount = models.DecimalField(max_digits=14, decimal_places=0)
+    date = models.DateField(auto_now_add=True)
+    def __str__(self):
+        return f"{self.name} - {self.amount}"
