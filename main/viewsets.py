@@ -390,11 +390,7 @@ class OrderViewset(ModelViewSet):
             'chayhona','room'
         ).prefetch_related('items')
     
-    @action(detail=True, methods=['get'])
-    @permission_classes([AllowAny])  # Bu yerda faqat action uchun permission
-    def summa(self, request, pk=None):
-        order = get_object_or_404(Order, id=pk)
-        return Response({"total_summa": order.total_summa})
+
     
     def list(self, request, *args, **kwargs):
         qs = self.get_queryset()
