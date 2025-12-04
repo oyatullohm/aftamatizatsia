@@ -284,7 +284,7 @@ class MenuItemViewset(ModelViewSet):
         sale_price = request.data.get('sale_price')
         category_id = request.data.get('category_id')
         data = request.data.get('ingredients', [])
-        kitchen_id = request.data.ger("kitchen_id")
+        kitchen_id = request.data.get("kitchen_id")
         menu_item = MenuItem.objects.create(
             chayhana= chayhana,
             name=name,
