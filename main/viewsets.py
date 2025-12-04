@@ -180,32 +180,34 @@ class IncomeProductViewset(ModelViewSet):
     
     def create(self, request, *args, **kwargs):
         chayhana = request.user.chayhana
-        product_id = request.data.get('product_id')
-        price = request.data.get('price')
-        count = request.data.get('count')
-        product = Product.objects.get(id=product_id)
-        product.count += int(count)
-        product.save()
-        income_product = IncomeProduct.objects.create(
-            chayhana= chayhana,
-            product_id=product_id,
-            price=price,
-            count=count
-        )
+        income_product = []
+        for i in request.data:
+            product_id = i.get('product_id')
+            price = i.get('price')
+            count = i.get('count')
+            product = Product.objects.get(id=product_id)
+            product.count += int(count)
+            product.save()
+            income= IncomeProduct.objects.create(
+                chayhana= chayhana,
+                product_id=product_id,
+                price=price,
+                count=count
+            )
+            income_product.append(income)
+            menu_items = MenuItem.objects.filter(
+            chayhana=chayhana,
+            name__iexact=product.name,
+            auto_count=True
+            )
+
+            for item in menu_items:
+                item.count += int(count)
+                item.save()
+
+
         
-        menu_items = MenuItem.objects.filter(
-        chayhana=chayhana,
-        name__iexact=product.name,
-        auto_count=True
-        )
-
-        for item in menu_items:
-            item.count += int(count)
-            item.save()
-
-
-        
-        serializers = IncomeProductSerializer(income_product )
+        serializers = IncomeProductSerializer(income_product,many = True)
         return Response(serializers.data) 
     
     def destroy(self, request, *args, **kwargs):

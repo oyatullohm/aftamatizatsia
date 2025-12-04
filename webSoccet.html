@@ -8,9 +8,9 @@
 <body>
     
 
-    <script>
+<script>
 const departmentId = 1; // misol uchun oshxona bo‘limining ID si
-const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
+const wsProtocol = window.location.protocol === "http:" ? "wss" : "ws";
 const wsUrl = `${wsProtocol}://${window.location.host}/ws/printer/${departmentId}/`;
 
 const socket = new WebSocket(wsUrl);
