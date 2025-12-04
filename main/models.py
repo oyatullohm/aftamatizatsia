@@ -85,7 +85,6 @@ class MenuItem(models.Model): # menyu uchun
     auto_count = models.BooleanField(default=False) 
     is_active = models.BooleanField(default=True)
     is_rejected = models.BooleanField(default=False)
-    reason_reject = models.CharField(max_length=255, null=True, blank=True)
     kitchen = models.ForeignKey(
         KitchenDepartment,
         on_delete=models.SET_NULL,
@@ -190,7 +189,7 @@ class OrderItem(models.Model):# buyurtma tarkibi
     menu_item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
     quantity = models.DecimalField(max_digits=10, decimal_places=0, default=0)
     cancel = models.BooleanField(default=False)
-    
+    reason_reject = models.CharField(max_length=255, null=True, blank=True)
 
     @property
     def total(self):

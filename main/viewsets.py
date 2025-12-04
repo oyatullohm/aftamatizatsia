@@ -167,16 +167,20 @@ class ProductViewset(ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         self.get_queryset().get(id=kwargs['pk']).delete()
         return Response({'sucsess':True})
-            
+class IncomePagination(PageNumberPagination):
+    page_size = 30          
 class IncomeProductViewset(ModelViewSet):
     permission_classes = [IsAuthenticated]
-    
     def get_queryset(self):
         return IncomeProduct.objects.filter(chayhana=self.request.user.chayhana).select_related('chayhana','product')
     
     def list(self, request, *args, **kwargs):
-        serializers = IncomeProductSerializer(self.get_queryset(),many= True)
-        return Response(serializers.data) 
+        queryset = self.get_queryset().order_by('-id')
+        paginator = IncomePagination()
+
+        page = paginator.paginate_queryset(queryset, request)
+        serializer = IncomeProductSerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
     
     def create(self, request, *args, **kwargs):
         chayhana = request.user.chayhana
@@ -297,20 +301,6 @@ class MenuItemViewset(ModelViewSet):
         serializers = MenuItemSerializer(menu_item )
         return Response(serializers.data)
     
-    @action(detail=True, methods=['post'])
-    def ingredients_add(self, request, pk=None):
-        """
-        bu funsiya menu item ga ingredient larni qo'shish uchun ishlatiladi
-        request data da ingredients list ko'rinishida bo'ladi:
-        [{"id": 1, "quantity": 2}, {"id": 3, "quantity": 0.5}]  
-        """
-        menu_item = self.get_queryset().get(id=pk)
-        data = request.data.get('ingredients', [])
-        menu_item.ingredients = data
-        menu_item.save()
-        return Response({
-            "success":True
-        })
 
     def retrieve(self, request, *args, **kwargs):
         menu_item = self.get_queryset().get(id=kwargs['pk'])
@@ -350,6 +340,8 @@ class MenuItemViewset(ModelViewSet):
         auto_count = request.data.get('auto_count')
         image = request.data.get('image')
         kitchen_id = request.data.get('kitchen_id')
+        is_rejected = request.data.get('is_rejected')
+        
         if name:
             menu_item.name = name
         if sale_price:
@@ -366,6 +358,8 @@ class MenuItemViewset(ModelViewSet):
             menu_item.count = count
         if kitchen_id:
             menu_item.kitchen_id= kitchen_id
+        if is_rejected:
+            menu_item.is_rejected = is_rejected
         menu_item.save()
         return Response(MenuItemSerializer(menu_item).data)
     
