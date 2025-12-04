@@ -168,7 +168,7 @@ class ProductViewset(ModelViewSet):
         self.get_queryset().get(id=kwargs['pk']).delete()
         return Response({'sucsess':True})
 class IncomePagination(PageNumberPagination):
-    page_size = 1         
+    page_size = 25         
 class IncomeProductViewset(ModelViewSet):
     permission_classes = [IsAuthenticated]
     def get_queryset(self):
