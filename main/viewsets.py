@@ -186,7 +186,8 @@ class IncomeProductViewset(ModelViewSet):
             price = i.get('price')
             count = i.get('count')
             product = Product.objects.get(id=product_id)
-            product.count += int(count)
+            product.price = price
+            product.count += count
             product.save()
             income= IncomeProduct.objects.create(
                 chayhana= chayhana,
