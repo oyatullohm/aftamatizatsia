@@ -1,16 +1,15 @@
 
-from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import  IsAuthenticated , AllowAny
-from .serializers import *
-from rest_framework.response import Response
 from rest_framework.decorators import action, permission_classes
 from rest_framework.pagination import PageNumberPagination
-from django.db.models import Q
-from django.utils import timezone
-from rest_framework import status
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.response import Response
 from .utlis import print_kitchen_check
+from rest_framework import status
+from django.utils import timezone
+from django.db.models import Q
+from .serializers import *
 from datetime import date
-from rest_framework.generics import get_object_or_404
 
 
 class CategoryViewset(ModelViewSet):
@@ -167,8 +166,10 @@ class ProductViewset(ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         self.get_queryset().get(id=kwargs['pk']).delete()
         return Response({'sucsess':True})
+
 class IncomePagination(PageNumberPagination):
     page_size = 25         
+
 class IncomeProductViewset(ModelViewSet):
     permission_classes = [IsAuthenticated]
     def get_queryset(self):

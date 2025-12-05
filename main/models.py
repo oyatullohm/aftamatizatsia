@@ -17,7 +17,10 @@ class Chayhana(models.Model):
 class CustomUser(AbstractUser):
     chayhana = models.ForeignKey(Chayhana, on_delete=models.CASCADE,null=True,blank=True) 
     phone = models.CharField(max_length=13)
-    role = models.CharField(max_length=50, default='ofisiant')  # ofisiant, admin, oshpaz, boshqaruvchi
+    is_admin = models.BooleanField(default=True)
+    is_kassa = models.BooleanField(default=False)
+    is_afisyant = models.BooleanField(default=False)   
+    
     def __str__(self):
         return f"{self.username}"
 

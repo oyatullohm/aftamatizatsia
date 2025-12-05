@@ -58,8 +58,15 @@ class AfisttyantRegisterView(APIView):
             return Response({'phone': 'Bu telefon raqam allaqachon ro‘yxatdan o‘tgan.'}, status=status.HTTP_400_BAD_REQUEST)
         user = CustomUser.objects.create_user(username=data['username'],
                                               password=data['password'],
-                                              phone=data['phone'])
-            
+                                              phone=data['phone'],
+                                              is_admin=False)
+        
+        is_kassa = data.get('is_kassa')
+        is_afisyant = data.get('is_afisyant')
+        if is_kassa:
+            user.is_kassa = True
+        if is_afisyant:
+            user.is_afisyant = True
         cayhana = request.user.chayhana
         user.chayhana = cayhana
 

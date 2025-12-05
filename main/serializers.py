@@ -74,7 +74,10 @@ class KitchenDepartmentSerializer(serializers.ModelSerializer):
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = [ 'id', 'username','phone', "is_active"]
+        fields = [
+                    'id', 'username','phone', "is_active",
+                    "is_admin", "is_kassa", "is_afisyant"
+                  ]
         
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
