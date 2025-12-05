@@ -107,7 +107,7 @@ class LoginView(APIView):
 @permission_classes([IsAuthenticated])
 def get_ofisiant(request):
     chayhana = request.user.chayhana
-    user = CustomUser.objects.filter(chayhana=chayhana, role='ofisiant')
+    user = CustomUser.objects.filter(chayhana=chayhana,)
     return Response(CustomUserSerializer(user, many = True).data)
 
 @api_view(['POST'])
