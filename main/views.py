@@ -25,7 +25,7 @@ class RegisterView(APIView):
         user = CustomUser.objects.create_user(username=data['username'],
                                               password=data['password'],
                                               phone=data['phone'],
-                                             role='admin')             
+                                              is_admin=True)             
         cayhana = Chayhana.objects.create(name=data.get('name'))
         Category.objects.bulk_create([
             Category(chayhana=cayhana, name="Taomlar"),
