@@ -72,7 +72,8 @@ class AfisttyantRegisterView(APIView):
 
         user.save()
         return Response({
-           'success':True
+           'success':True,
+           'user':CustomUserSerializer(user).data
         }, status=status.HTTP_201_CREATED)
 
 class LoginView(APIView):
