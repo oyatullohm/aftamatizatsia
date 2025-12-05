@@ -22,6 +22,7 @@ urlpatterns = [
    path('ofisiant/register/', AfisttyantRegisterView.as_view(), name='hodim'),
    path('get-ofisiant/', get_ofisiant, name='hodimlar'),
    path('ofisiant/', ofisiant, name='hodim'),
+   path('user/', get_user, name='user'),
    path('login/',LoginView.as_view(), name='login'),
    
    # path('category/', category, name='category'),

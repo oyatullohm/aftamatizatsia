@@ -102,6 +102,11 @@ class LoginView(APIView):
         else:
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user(request):
+    return Response({'user':CustomUserSerializer(request.user).data})
+    
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
