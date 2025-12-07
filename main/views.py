@@ -96,7 +96,15 @@ class LoginView(APIView):
                     'first_name': user.first_name,
                     'last_name': user.last_name,
                     'phone': user.phone,
-                    "is_staff":user.is_staff
+                    "is_staff":user.is_staff,
+                    'is_admin': user.is_admin,
+                    'is_kassa': user.is_kassa,
+                    'is_afisyant': user.is_afisyant,
+                    'chayhana': {
+                        'id': user.chayhana.id,
+                        'uid': user.chayhana.uid,
+                        'name': user.chayhana.name,
+                    } if user.chayhana else None
                 }
             }, status=status.HTTP_200_OK)
         else:
