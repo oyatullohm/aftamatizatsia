@@ -479,7 +479,7 @@ class OrderViewset(ModelViewSet):
         room = data.get('room')
         arrival_time = data.get('arrival_time')
         time_to_leave = data.get('time_to_leave')
-        update_at  = timezone.datetime()
+        # update_at  = timezone.datetime()
         order = self.get_queryset().get(id=kwargs['pk'])
         if client_name:
             order.client_name = client_name
@@ -491,79 +491,79 @@ class OrderViewset(ModelViewSet):
             order.arrival_time = arrival_time
         if time_to_leave:
             order.time_to_leave = time_to_leave
-        order.update_at = update_at
+        # order.update_at = update_at
         order.save()
         return Response({
             OrderSerializer(order).data
         })
 
-    # @action(detail=True, methods=['post'])
-    # def finished(self, request, pk=None):
-    #     payments = request.data.get('payments', [])   # bir nechta to‘lov
+    @action(detail=True, methods=['post'])
+    def finished(self, request, pk=None):
+        payments = request.data.get('payments', [])   # bir nechta to‘lov
         
-    #     if not payments:
-    #         return Response({"error": "Payments bo‘sh bo‘lishi mumkin emas"}, status=400)
+        if not payments:
+            return Response({"error": "Payments bo‘sh bo‘lishi mumkin emas"}, status=400)
 
-    #     order = self.get_queryset().get(id=pk)
+        order = self.get_queryset().get(id=pk)
 
-    #     # Afitsiantni aniqlaymiz
-    #     item = order.items.filter(cancel=False).first()
-    #     if not item or not item.afisttyant:
-    #         return Response({"error": "Afitsiant topilmadi."}, status=400)
-    #     user = item.afisttyant
+        # Afitsiantni aniqlaymiz
+        item = order.items.filter(cancel=False).first()
+        if not item or not item.afisttyant:
+            return Response({"error": "Afitsiant topilmadi."}, status=400)
+        user = item.afisttyant
 
-    #     # Orderni tugatamiz
-    #     order.finished = True
-    #     order.save()
+        # Orderni tugatamiz
+        order.finished = True
+        order.save()
 
-    #     # IncomeUser
-    #     today = date.today()
-    #     income_user, created = IncomeUser.objects.get_or_create(
-    #         chayhona=order.chayhona,
-    #         user=user,
-    #         date=today,
-    #     )
+        # IncomeUser
+        today = date.today()
+        income_user, created = IncomeUser.objects.get_or_create(
+            chayhona=order.chayhona,
+            user=user,
+            date=today,
+        )
 
-    #     # Service hisoblash
-    #     service_sum = order.calculate_service()
+        # Service hisoblash
+        service_sum = order.calculate_service()
 
-    #     # IncomeItemUser
-    #     income_item, created = IncomeItemUser.objects.get_or_create(
-    #         income=income_user,
-    #         order=order,
-    #         defaults={"summa": service_sum}
-    #     )
+        # IncomeItemUser
+        income_item, created = IncomeItemUser.objects.get_or_create(
+            income=income_user,
+            order=order,
+            defaults={"summa": service_sum}
+        )
 
-    #     if created:
-    #         income_user.add_summa(service_sum)
+        if created:
+            income_user.add_summa(service_sum)
 
-    #     # 🔥 Kassa bo‘yicha to‘lovlarni qo‘shish
-    #     total_payment = 0
+        # 🔥 Kassa bo‘yicha to‘lovlarni qo‘shish
+        total_payment = 0
 
-    #     for p in payments:
-    #         kassa_id = p.get('kassa_id')
-    #         summa = p.get('summa')
+        for p in payments:
+            kassa_id = p.get('kassa_id')
+            summa = p.get('summa')
 
-    #         if not kassa_id or not summa:
-    #             return Response({"error": "Har bir paymentda kassa_id va summa bo‘lishi kerak"}, status=400)
+            if not kassa_id or not summa:
+                return Response({"error": "Har bir paymentda kassa_id va summa bo‘lishi kerak"}, status=400)
 
-    #         try:
-    #             kassa = Kassa.objects.get(id=kassa_id)
-    #         except Kassa.DoesNotExist:
-    #             return Response({"error": f"Kassa topilmadi: {kassa_id}"}, status=404)
+            try:
+                kassa = Kassa.objects.get(id=kassa_id)
+            except Kassa.DoesNotExist:
+                return Response({"error": f"Kassa topilmadi: {kassa_id}"}, status=404)
 
-    #         kassa.balance += summa
-    #         kassa.save()
-    #         total_payment += summa
+            kassa.balance += summa
+            kassa.save()
+            total_payment += summa
 
-    #     return Response({
-    #         "success": True,
-    #         "order_total": order.total_summa,
-    #         "paid_sum": total_payment,
-    #         "service_sum": service_sum,
-    #         "income_user_total": income_user.total_summa,
-    #         "message": "Order yakunlandi va to‘lovlar bir nechta kassaga bo‘lindi"
-    #     })
+        return Response({
+            "success": True,
+            "order_total": order.total_summa,
+            "paid_sum": total_payment,
+            "service_sum": service_sum,
+            "income_user_total": income_user.total_summa,
+            "message": "Order yakunlandi va to‘lovlar bir nechta kassaga bo‘lindi"
+        })
 
             
     @action(detail=True, methods=['post'])
