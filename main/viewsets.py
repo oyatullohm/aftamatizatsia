@@ -482,19 +482,17 @@ class OrderViewset(ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # ✅ CREATE malumot yaratish
-        serializer = self.get_serializer(data={
-            "room": room_id,
-            # "customer": customer_id,
-            'client_name': client_name,
-            'phone': phone,
-            "arrival_time": arrival_time,
-            "time_to_leave": time_to_leave,
-            "chayhona": request.user.chayhana.id
-        })
-
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        # ✅ CREATE malumot yaratish        
+        order = Order.objects.create(
+            chayhona=request.user.chayhana,
+            room_id= room_id,
+            # "customer": customer_id,      
+            client_name= client_name,
+            phone= phone,
+            arrival_time= arrival_time,
+            time_to_leave=time_to_leave,
+         )
+        serializer = OrderSerializer(order)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
