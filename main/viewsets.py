@@ -385,7 +385,7 @@ class OrderViewset(ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = OrderSerializer
     def get_queryset(self):
-        return Order.objects.filter(chayhona=self.request.user.chayhona, finished=False).select_related(
+        return Order.objects.filter(chayhona=self.request.user.chayhana, finished=False).select_related(
             'chayhona','room'
         ).prefetch_related('items')
     
