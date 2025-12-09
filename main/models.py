@@ -188,7 +188,7 @@ class Order(models.Model): #buyurtma uchun
 class OrderItem(models.Model):# buyurtma tarkibi
     chayhona = models.ForeignKey(Chayhana, on_delete=models.CASCADE)
     afisttyant = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)  
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items", null=True,blank=True)
     menu_item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
     quantity = models.DecimalField(max_digits=10, decimal_places=0, default=0)
     cancel = models.BooleanField(default=False)

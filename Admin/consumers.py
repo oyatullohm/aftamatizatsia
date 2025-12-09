@@ -5,10 +5,10 @@ class KitchenOrderConsumer(AsyncJsonWebsocketConsumer):
     
     Ushbu consumer ma'lum bir oshxona bo'limiga tegishli buyurtmalarni qabul qiladi va
     ularni tegishli guruhga yuboradi.
-       Args:
+       Args:
         AsyncJsonWebsocketConsumer: Django Channels kutubxonasidan kelgan asinxron
         JSON WebSocket consumer.
-    Methods:
+    Methods:
         connect: WebSocket ulanishini qabul qiladi va guruhga qo'shadi.
         disconnect: WebSocket ulanishini uzadi va guruhdan olib tashlaydi.
         receive_json: JSON formatidagi xabarlarni qabul qiladi va guruhga yuboradi.

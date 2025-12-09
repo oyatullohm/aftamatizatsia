@@ -7,7 +7,8 @@ from rest_framework.response import Response
 from .utlis import print_kitchen_check
 from rest_framework import status
 from django.utils import timezone
-from django.db.models import Q
+from django.db import transaction
+from django.db.models import Q 
 from .serializers import *
 from datetime import date
 
@@ -416,9 +417,7 @@ class OrderViewset(ModelViewSet):
         # ✅ finished bo‘yicha filtr (true/false)
         if finished is not None:
             if finished.lower() in ["true", "1"]:
-                qs = qs.filter(finished=True)
-            elif finished.lower() in ["false", "0"]:
-                qs = qs.filter(finished=False)
+                qs =  Order.objects.filter(chayhona=self.request.user.chayhona,).filter(finished=True)
         # ✅ created_at bo‘yicha sana oralig‘i
         if date_from:
             qs = qs.filter(created_at__date__gte=date_from)
@@ -442,17 +441,15 @@ class OrderViewset(ModelViewSet):
 
         serializer = OrderSerializer(qs, many=True)
         return Response(serializer.data)
-    
+
+
     def create(self, request, *args, **kwargs):
         data = request.data
-        
         room_id = data.get("room")
         phone = data.get("phone ", "")
         client_name = data.get("name", "")
         arrival_time = data.get("arrival_time")
         time_to_leave = data.get("time_to_leave")
-
-
         if not time_to_leave:
             return Response({"error": "time_to_leave is required"}, status=400)
 
@@ -471,6 +468,7 @@ class OrderViewset(ModelViewSet):
 
         # ✅ Xona bandligini tekshirish
         conflicts = Order.objects.filter(
+            chayhona = request.user.chayhana,
             room_id=room_id,
             finished=False,  # Active orders only
             arrival_time__lt=time_to_leave,
@@ -598,8 +596,10 @@ class OrderViewset(ModelViewSet):
         order = self.get_queryset().get(id=pk)
         order.cancel = True
         order.finished = True
+        for i in order.items.filter(cancel=False):
+            i.menu_item += i.quantity
+            i.menu_item.save()
         order.save()
-
         return Response({
             "success":True
         })
@@ -625,57 +625,84 @@ class OrderItemViewset(ModelViewSet):
             OrderItemSerializer(queryset, many=True).data
         )
     
+
     def create(self, request, *args, **kwargs):
         data = request.data
 
+        # items majburiy
+        items = data.get("items")
+        if not items or not isinstance(items, list):
+            return Response({"error": "items list required"}, status=400)
+
         order_id = data.get("order_id")
-        menu_item_id = data.get("menu_item_id")
-        quantity = data.get("quantity")
 
-        if not order_id:
-            return Response({"error": "order_id required"}, status=400)
-
-        if not menu_item_id:
-            return Response({"error": "menu_item_id required"}, status=400)
-
-        # quantity string bo'lib keladi → int ga o'tkazamiz
-        try:
-            quantity = int(quantity)
-        except:
-            quantity = 1
-
-        # Itemni yaratamiz yoki topamiz
-        item, created = OrderItem.objects.get_or_create(
-            chayhona=request.user.chayhona,
-            order_id=order_id,
-            menu_item_id=menu_item_id,
-            defaults={"quantity": quantity}
-        )
-
-        # qancha qo‘shildi — eski bo‘lsa qo‘shamiz
-        added_quantity = quantity
-        if not created:
-            item.quantity += quantity
-            item.save()
-
-        # 🔥 Omborni yangilash (minus qilish)
-        menu_item = item.menu_item
-
-        for ingredient in menu_item.ingredients:
-            product_id = ingredient.get("id")
-            konsum = ingredient.get("quantity")   # 1 porsiya uchun sarf
-
+        if order_id:
             try:
-                product = Product.objects.get(id=product_id, chayhona=request.user.chayhona)
-            except Product.DoesNotExist:
-                continue  # Product topilmasa skip
+                order = Order.objects.get(id=order_id, chayhona=request.user.chayhona)
+            except:
+                pass
+        else:
+            order = Order.objects.create(chayhona=request.user.chayhona)
 
-            minus_amount = konsum * added_quantity
-            product.count -= minus_amount
-            product.save()
-        print_kitchen_check(item)
-        return Response(OrderItemSerializer(item).data, status=201)
+        created_items = []
+        with transaction.atomic():
+            for item in items:
+                
+                menu_item_id = item.get("menu_item_id")
+                quantity = item.get("quantity", 1)
 
+                if not menu_item_id:
+                    return Response({"error": "menu_item_id is required"}, status=400)
+
+                # quantity str bo‘lib kelishi mumkin
+                try:
+                    quantity = int(quantity)
+                except:
+                    quantity = 1
+
+                # 🔥 OrderItem qo‘shamiz yoki yangilaymiz
+                order_item, created = OrderItem.objects.get_or_create(
+                    order=order,
+                    chayhona=request.user.chayhona,
+                    menu_item_id=menu_item_id,
+                    defaults={"quantity": quantity}
+                )
+
+                if not created:
+                    order_item.quantity += quantity
+                    order_item.save()
+
+                created_items.append(order_item)
+
+                # --------------------------
+                # 🔥 Omborni kamaytirish
+                # --------------------------
+                menu_item = order_item.menu_item
+
+                # ingredientlar dict list bo‘lsa:
+                for ing in menu_item.ingredients:
+                    product_id = ing.get("id")
+                    konsum = ing.get("quantity")  # 1 porsiya uchun sarf
+
+                    try:
+                        product = Product.objects.get(
+                            id=product_id,
+                            chayhona=request.user.chayhona
+                        )
+                    except Product.DoesNotExist:
+                        continue
+
+                    minus_amount = konsum * quantity
+                    product.count -= minus_amount
+                    product.save()
+                    menu_item -= order_item.quantity
+                    menu_item.save()
+            print_kitchen_check(created_items)
+
+
+        serializer = OrderItemSerializer(created_items, many=True)
+        return Response(serializer.data, status=201)
+    
     def retrieve(self, request, order_id, pk):
         item = self.get_queryset(order_id).get(id=pk)
         return Response({
@@ -710,6 +737,7 @@ class OrderItemViewset(ModelViewSet):
         return Response({
             OrderItemSerializer(item).data
         }) 
+    
     @action(detail=True,methods=['post'])
     def cancel(self,request, order_id, pk):
         item = self.get_queryset(order_id).get(id=pk)
@@ -718,7 +746,8 @@ class OrderItemViewset(ModelViewSet):
         for ingredient in menu_item.ingredients:
             product_id = ingredient.get("id")
             konsum = ingredient.get("quantity")
-            
+            menu_item += item.quantity 
+            menu_item.save()
             try:
                 product = Product.objects.get(id=product_id, chayhona=request.user.chayhona)
             except Product.DoesNotExist:
