@@ -419,7 +419,7 @@ class OrderViewset(ModelViewSet):
                 qs =  Order.objects.filter(chayhona=self.request.user.chayhona,).filter(finished=True)
         # ✅ created_at bo‘yicha sana oralig‘i
         if date_from:
-            qs = qs.filter(arrival_from__date__gte=date_from)
+            qs = qs.filter(arrival_from__date=date_from)
 
         # ✅ arrival_time bo‘yicha filtr (datetime)
         if arrival_from:
