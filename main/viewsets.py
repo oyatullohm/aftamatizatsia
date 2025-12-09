@@ -398,7 +398,6 @@ class OrderViewset(ModelViewSet):
         room_id = request.GET.get("room_id")
         finished = request.GET.get("finished")
         date_from = request.GET.get("date_from")  # 2025-11-07
-        date_to = request.GET.get("date_to")      # 2025-11-10
         arrival_from = request.GET.get("arrival_from")
         arrival_to = request.GET.get("arrival_to")
         leave_from = request.GET.get("leave_from")
@@ -420,10 +419,7 @@ class OrderViewset(ModelViewSet):
                 qs =  Order.objects.filter(chayhona=self.request.user.chayhona,).filter(finished=True)
         # ✅ created_at bo‘yicha sana oralig‘i
         if date_from:
-            qs = qs.filter(created_at__date__gte=date_from)
-
-        if date_to:
-            qs = qs.filter(created_at__date__lte=date_to)
+            qs = qs.filter(arrival_from__date__gte=date_from)
 
         # ✅ arrival_time bo‘yicha filtr (datetime)
         if arrival_from:
