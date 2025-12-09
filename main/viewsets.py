@@ -446,7 +446,7 @@ class OrderViewset(ModelViewSet):
     def create(self, request, *args, **kwargs):
         data = request.data
         room_id = data.get("room")
-        phone = data.get("phone ", "")
+        phone = data.get("phone")
         client_name = data.get("name", "")
         arrival_time = data.get("arrival_time")
         time_to_leave = data.get("time_to_leave")

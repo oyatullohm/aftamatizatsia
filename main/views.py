@@ -145,7 +145,6 @@ def chayhana(request):
     return Response(data)
 
 
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def free_rooms(request):
@@ -220,6 +219,7 @@ def room_busy_dates(request):
 def summa( request, pk=None):
     order = get_object_or_404(Order, id=pk)
     return Response({"total_summa": order.total_summa})
+
 class MobileCreateOrderView(APIView):
     permission_classes = [IsAuthenticated]
 
