@@ -493,9 +493,9 @@ class OrderViewset(ModelViewSet):
             order.time_to_leave = time_to_leave
         # order.update_at = update_at
         order.save()
-        return Response({
+        return Response(
             OrderSerializer(order).data
-        })
+        )
 
     @action(detail=True, methods=['post'])
     def finished(self, request, pk=None):
