@@ -711,9 +711,9 @@ class OrderItemViewset(ModelViewSet):
                     continue  # Product topilmasa skip
 
                 
-        return Response({
+        return Response(
             OrderItemSerializer(item).data
-        }) 
+        ) 
     
     @action(detail=True,methods=['post'])
     def cancel(self,request, order_id, pk):
