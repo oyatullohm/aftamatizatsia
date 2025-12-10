@@ -595,13 +595,13 @@ class OrderItemViewset(ModelViewSet):
     permission_classes =[ IsAuthenticated]
     def get_queryset(self,order_id):
         return  OrderItem.objects.filter(
-            chayhona=self.request.user.chayhana
+            chayhona=self.request.user.chayhana,
+            order_id=order_id
         ).select_related('chayhona', 'order', 'menu_item')
     
     def list(self, request, *args, **kwargs):
         order_id = request.GET.get('order_id')
-        order = Order.objects.get(id=order_id)
-        queryset = self.get_queryset().get(order=order)
+        queryset = self.get_queryset(order_id)
         return Response(
             OrderItemSerializer(queryset, many=True).data
         )
