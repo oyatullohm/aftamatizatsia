@@ -600,7 +600,8 @@ class OrderItemViewset(ModelViewSet):
     
     def list(self, request, *args, **kwargs):
         order_id = request.GET.get('order_id')
-        queryset = self.get_queryset().get(order_id=order_id)
+        order = Order.objects.get(id=order_id)
+        queryset = self.get_queryset().get(order=order)
         return Response(
             OrderItemSerializer(queryset, many=True).data
         )
