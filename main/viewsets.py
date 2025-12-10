@@ -509,33 +509,34 @@ class OrderViewset(ModelViewSet):
         # Afitsiantni aniqlaymiz
         item = order.items.filter(cancel=False).first()
         if not item or not item.afisttyant:
-            return Response({"error": "Afitsiant topilmadi."}, status=400)
-        user = item.afisttyant
-
+            user = item.afisttyant
+        else:
+            user = None
         # Orderni tugatamiz
         order.finished = True
         order.save()
 
         # IncomeUser
         today = date.today()
-        income_user, created = IncomeUser.objects.get_or_create(
-            chayhona=order.chayhona,
-            user=user,
-            date=today,
-        )
+        if user:
+            income_user, created = IncomeUser.objects.get_or_create(
+                chayhona=order.chayhona,
+                user=user,
+                date=today,
+            )
 
         # Service hisoblash
-        service_sum = order.calculate_service()
+            service_sum = order.calculate_service()
 
         # IncomeItemUser
-        income_item, created = IncomeItemUser.objects.get_or_create(
-            income=income_user,
-            order=order,
-            defaults={"summa": service_sum}
-        )
+            income_item, created = IncomeItemUser.objects.get_or_create(
+                income=income_user,
+                order=order,
+                defaults={"summa": service_sum}
+            )
 
-        if created:
-            income_user.add_summa(service_sum)
+            if created:
+                income_user.add_summa(service_sum)
 
         # 🔥 Kassa bo‘yicha to‘lovlarni qo‘shish
         total_payment = 0
@@ -568,16 +569,21 @@ class OrderViewset(ModelViewSet):
             
     @action(detail=True, methods=['post'])
     def cancel(self,request, pk=None):
-        order = self.get_queryset().get(id=pk)
-        order.cancel = True
-        order.finished = True
-        for i in order.items.filter(cancel=False):
-            i.menu_item += i.quantity
-            i.menu_item.save()
-        order.save()
-        return Response({
-            "success":True
-        })
+        try:
+            order = self.get_queryset().get(id=pk)
+            order.cancel = True
+            order.finished = True
+            for i in order.items.filter(cancel=False):
+                i.menu_item += i.quantity
+                i.menu_item.save()
+            order.save()
+            return Response({
+                "success":True
+            })
+        except:
+            return Response({
+                "success":False
+            })
 
         
     def destroy(self, request, *args, **kwargs):
@@ -594,8 +600,8 @@ class OrderItemViewset(ModelViewSet):
         ).select_related('chayhona', 'order', 'menu_item')
     
     def list(self, request, *args, **kwargs):
-        order_id = request.GET.get('order-id')
-        queryset = self.get_queryset(order_id)
+        order_id = request.GET.get('order_id')
+        queryset = self.get_queryset().get(order_id=order_id)
         return Response(
             OrderItemSerializer(queryset, many=True).data
         )
@@ -638,7 +644,7 @@ class OrderItemViewset(ModelViewSet):
                 # 🔥 OrderItem qo‘shamiz yoki yangilaymiz
                 order_item, created = OrderItem.objects.get_or_create(
                     order=order,
-                    chayhona=request.user.chayhona,
+                    chayhona=request.user.chayhana,
                     menu_item_id=menu_item_id,
                     defaults={"quantity": quantity}
                 )
