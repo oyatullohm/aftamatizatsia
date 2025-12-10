@@ -595,8 +595,7 @@ class OrderItemViewset(ModelViewSet):
     permission_classes =[ IsAuthenticated]
     def get_queryset(self,order_id):
         return  OrderItem.objects.filter(
-            chayhona=self.request.user.chayhana,
-            order_id=order_id
+            chayhona=self.request.user.chayhana
         ).select_related('chayhona', 'order', 'menu_item')
     
     def list(self, request, *args, **kwargs):
