@@ -668,7 +668,7 @@ class OrderItemViewset(ModelViewSet):
                     try:
                         product = Product.objects.get(
                             id=product_id,
-                            chayhona=request.user.chayhona
+                            chayhona=request.user.chayhana
                         )
                     except Product.DoesNotExist:
                         continue
