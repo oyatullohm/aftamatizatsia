@@ -685,10 +685,10 @@ class OrderItemViewset(ModelViewSet):
         return Response(serializer.data, status=201)
     
 
-    def update(self, request, order_id, pk):
+    def update(self, request,*args, **kwargs):
         data = request.data
         quantity = data.get('quantity')
-        item = self.get_queryset(order_id).get(id=pk)
+        item = OrderItem.objects.get(id=kwargs['pk'])
         if quantity:
             # qancha o'zgardi
             added_quantity = int(quantity) - item.quantity
@@ -703,7 +703,7 @@ class OrderItemViewset(ModelViewSet):
                 konsum = ingredient.get("quantity")   # 1 porsiya uchun sarf
 
                 try:
-                    product = Product.objects.get(id=product_id, chayhona=request.user.chayhona)
+                    product = Product.objects.get(id=product_id, chayhona=request.user.chayhana)
                 except Product.DoesNotExist:
                     continue  # Product topilmasa skip
 
