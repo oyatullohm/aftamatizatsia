@@ -670,7 +670,7 @@ class OrderItemViewset(ModelViewSet):
                             id=product_id,
                             chayhona=request.user.chayhana
                         )
-                    except Product.DoesNotExist:
+                    except:
                         continue
 
                     minus_amount = konsum * quantity
