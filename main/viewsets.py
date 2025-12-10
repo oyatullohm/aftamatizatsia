@@ -684,8 +684,8 @@ class OrderItemViewset(ModelViewSet):
         serializer = OrderItemSerializer(created_items, many=True)
         return Response(serializer.data, status=201)
     
-    def retrieve(self, request, order_id, pk):
-        item = self.get_queryset(order_id).get(id=pk)
+    def retrieve(self, request, *args, **kwargs):
+        item = self.get_queryset().get(id=kwargs['pk'])
         return Response({
             OrderItemSerializer(item).data
         })
