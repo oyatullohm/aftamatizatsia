@@ -619,11 +619,11 @@ class OrderItemViewset(ModelViewSet):
 
         if order_id:
             try:
-                order = Order.objects.get(id=order_id, chayhona=request.user.chayhona)
+                order = Order.objects.get(id=order_id, chayhona=request.user.chayhana)
             except:
                 pass
         else:
-            order = Order.objects.create(chayhona=request.user.chayhona)
+            order = Order.objects.create(chayhona=request.user.chayhana)
 
         created_items = []
         with transaction.atomic():
