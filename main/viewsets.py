@@ -704,12 +704,13 @@ class OrderItemViewset(ModelViewSet):
 
                 try:
                     product = Product.objects.get(id=product_id, chayhona=request.user.chayhana)
-                except Product.DoesNotExist:
+                    minus_amount = konsum * added_quantity
+                    product.count -= minus_amount
+                    product.save()
+                except:
                     continue  # Product topilmasa skip
 
-                minus_amount = konsum * added_quantity
-                product.count -= minus_amount
-                product.save()
+                
         return Response({
             OrderItemSerializer(item).data
         }) 
