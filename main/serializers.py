@@ -51,9 +51,12 @@ class MenuItemAdminSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     # created_at = serializers.SerializerMethodField()
+    total_summa = serializers.SerializerMethodField()
     class Meta:
         model = Order
         fields = "__all__"
+    def get_total_summa(self, obj):
+        return obj.total_summa
 
     # def get_created_at(self,obj):
     #     return obj.created_at.strftime("%04d-%02d-%02d:%H:%M")
