@@ -300,7 +300,7 @@ def shot(request,id):
     items__isnull=False
         ).distinct().last()
 
-    return Response(OrderSerializer(o).data,{'total_summa':o.total_summa})
+    return Response(OrderSerializer(o).data)
 
 
 @api_view(['GET'])
