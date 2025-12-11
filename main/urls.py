@@ -30,6 +30,7 @@ urlpatterns = [
    # path('afisttant/', afisttant, name='afisttant'),
    path('free-rooms/', free_rooms, name='free_rooms'),
    path('room-busy-dates/', room_busy_dates, name='room_busy_dates'),
+   path('url', url, name='url'),
    
 ]
 urlpatterns+=router.urls

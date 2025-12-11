@@ -274,4 +274,20 @@ class MobileCreateOrderView(APIView):
             "message": "Buyurtma muvaffaqiyatli yaratildi"
         }, status=201)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def url (request):
+    menu = f"/menu/{request.user.chayhana.uid}/"
+    order_url = []
+    for i in Room.objects.filter(chayhana=request.user.chayhana):
+        order_url.append(
+            f"/shot{i.name}/{request.user.chayhana.uid}/{i.id}/"
+        )
+    return Response(
+        {
+            "menu":menu,
+            "order_url":order_url
+        }
+    )
+    
 
