@@ -717,25 +717,32 @@ class OrderItemViewset(ModelViewSet):
     
     @action(detail=True,methods=['post'])
     def cancel(self,request, pk ):
-        item = Order.objects.get(id=pk)
-        menu_item = item.menu_item
-        added_quantity  = item.quantity
-        for ingredient in menu_item.ingredients:
-            product_id = ingredient.get("id")
-            konsum = ingredient.get("quantity")
-            menu_item += item.quantity 
-            menu_item.save()
-            try:
-                product = Product.objects.get(id=product_id, chayhona=request.user.chayhona)
-            except Product.DoesNotExist:
-                continue  # Product topilmasa skip
+        item = OrderItem.objects.get(id=pk)
+        if item.menu_item.is_rejected:
 
-            minus_amount = konsum * added_quantity
-            product.count += minus_amount
-            product.save()
+            menu_item = item.menu_item
+            added_quantity  = item.quantity
+            for ingredient in menu_item.ingredients:
+                product_id = ingredient.get("id")
+                konsum = ingredient.get("quantity")
+                menu_item += item.quantity 
+                menu_item.save()
+                try:
+                    product = Product.objects.get(id=product_id, chayhona=request.user.chayhona)
+                except Product.DoesNotExist:
+                    continue  # Product topilmasa skip
+
+                minus_amount = konsum * added_quantity
+                product.count += minus_amount
+                product.save()
+            return Response({
+                "success":True
+                
+            })
         return Response({
-            "success":True
-        })
+                "success": False,
+                "info":"takaz mumkin emas"
+            })
 
     def destroy(self, request, *args, **kwargs):
         return Response({
