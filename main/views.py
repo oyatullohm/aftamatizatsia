@@ -281,7 +281,7 @@ def url (request):
     order_url = []
     for i in Room.objects.filter(chayhana=request.user.chayhana):
         order_url.append(
-            f"/shot{i.name}/{request.user.chayhana.uid}/{i.id}/"
+            f"/shot{i.name}//{request.user.chayhana.uid}//{i.id}/"
         )
     return Response(
         {
