@@ -716,8 +716,8 @@ class OrderItemViewset(ModelViewSet):
         ) 
     
     @action(detail=True,methods=['post'])
-    def cancel(self,request, order_id, pk):
-        item = self.get_queryset(order_id).get(id=pk)
+    def cancel(self,request, pk ):
+        item = Order.objects.get(id=pk)
         menu_item = item.menu_item
         added_quantity  = item.quantity
         for ingredient in menu_item.ingredients:
