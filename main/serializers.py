@@ -50,13 +50,13 @@ class MenuItemAdminSerializer(serializers.ModelSerializer):
         return result
 
 class OrderSerializer(serializers.ModelSerializer):
-    created_at = serializers.SerializerMethodField()
+    # created_at = serializers.SerializerMethodField()
     class Meta:
         model = Order
         fields = "__all__"
 
-    def get_created_at(self,obj):
-        return obj.created_at.strftime("%04d-%02d-%02d:%H:%M")
+    # def get_created_at(self,obj):
+    #     return obj.created_at.strftime("%04d-%02d-%02d:%H:%M")
     
 class OrderItemSerializer(serializers.ModelSerializer):
     # created_at = serializers.SerializerMethodField()

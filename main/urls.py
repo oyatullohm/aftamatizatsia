@@ -32,5 +32,9 @@ urlpatterns = [
    path('room-busy-dates/', room_busy_dates, name='room_busy_dates'),
    path('url', url, name='url'),
    
+   path('menu-client/<int:pk>/', menu, name='menu-client'),
+   path('shot/<int:id>/', shot, name='shot'),
+
+   
 ]
 urlpatterns+=router.urls

@@ -277,11 +277,11 @@ class MobileCreateOrderView(APIView):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def url (request):
-    menu = f"/menu/{request.user.chayhana.uid}/"
+    menu = f"/menu-client/{request.user.chayhana.uid}/"
     order_url = []
     for i in Room.objects.filter(chayhana=request.user.chayhana):
         order_url.append(
-            [i.name ,f"/shot/{request.user.chayhana.uid}/{i.id}/"]
+            [i.name ,f"/shot/{i.id}/"]
         )
     return Response(
         {
@@ -290,4 +290,23 @@ def url (request):
         }
     )
     
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def shot(request,id):
+    o = Order.objects.filter(
+    room_id=id,
+    finished=False,
+    cancel=False,
+    items__isnull=False
+        ).distinct().last()
+
+    return Response(OrderSerializer(o).data,{'total_summa':o.total_summa})
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def menu(request, pk):
+    m = MenuItem.objects.filter(chayhana__uid=pk, is_active=True,)
+    return Response(MenuItemSerializer(m, many=True).data)
+
 
