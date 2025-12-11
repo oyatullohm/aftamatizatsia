@@ -300,7 +300,7 @@ def shot(request,id):
     items__isnull=False
         ).distinct().last()
 
-    return Response(OrderSerializer(o).data)
+    return Response(RomOrderItemSrialiser(o).data)
 
 
 @api_view(['GET'])

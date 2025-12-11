@@ -61,7 +61,21 @@ class OrderSerializer(serializers.ModelSerializer):
 
     # def get_created_at(self,obj):
     #     return obj.created_at.strftime("%04d-%02d-%02d:%H:%M")
+class RomOrderItemSrialiser(serializers.ModelSerializer):
+    room = RoomSerializer()
+    items = serializers.SerializerMethodField()
+    total_summa = serializers.SerializerMethodField()
+    class Meta:
+        model = Order
+        fields = ['id', 'client_name', 'phone', 'room', 'created_at', 'items', 'total_summa']
     
+    def get_items(self, obj):
+        items = obj.items.all()
+        return OrderItemSerializer(items, many=True).data
+
+    def get_total_summa(self, obj):
+        return obj.total_summa
+
 class OrderItemSerializer(serializers.ModelSerializer):
     # created_at = serializers.SerializerMethodField()
     class Meta:
