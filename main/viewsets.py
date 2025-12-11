@@ -718,8 +718,7 @@ class OrderItemViewset(ModelViewSet):
     @action(detail=True,methods=['post'])
     def cancel(self,request, pk ):
         item = OrderItem.objects.get(id=pk)
-        if item.menu_item.is_rejected:
-
+        if item.menu_item.is_rejected and item.cancel== False:
             menu_item = item.menu_item
             added_quantity  = item.quantity
             for ingredient in menu_item.ingredients:
