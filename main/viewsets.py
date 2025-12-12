@@ -808,9 +808,9 @@ class KassaViewset(ModelViewSet):
     
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        return Response({
+        return Response(
             KassaSerializer(queryset, many=True).data
-        })
+        )
     
     def retrieve(self, request, *args, **kwargs):
         kassa = self.get_queryset().get(id=kwargs['pk'])
@@ -819,13 +819,10 @@ class KassaViewset(ModelViewSet):
     def update(self, request, *args, **kwargs):
         data = request.data
         name = data.get('name')
-        initial_amount = data.get('initial_amount')
         kassa = self.get_queryset().get(id=kwargs['pk'])
         
         if name:
             kassa.name = name
-        if initial_amount:
-            kassa.initial_amount = initial_amount
         kassa.save()
         
         return Response(KassaSerializer(kassa).data)
