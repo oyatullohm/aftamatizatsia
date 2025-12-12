@@ -221,7 +221,7 @@ class IncomeItemUser(models.Model):
 
 class Kassa(models.Model):
     chayhona = models.ForeignKey(Chayhana, on_delete=models.CASCADE)
-    name = models.CharField(max_length=55)
+    name = models.CharField(max_length=55, default="Kassa")
     date = models.DateField(auto_now_add=True)
     balance = models.DecimalField(max_digits=14, decimal_places=0, default=0)
 
