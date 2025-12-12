@@ -221,12 +221,13 @@ class IncomeItemUser(models.Model):
 
 class Kassa(models.Model):
     chayhona = models.ForeignKey(Chayhana, on_delete=models.CASCADE)
+    name = models.CharField(max_length=55)
     date = models.DateField(auto_now_add=True)
     balance = models.DecimalField(max_digits=14, decimal_places=0, default=0)
 
 class Cost(models.Model):
     chayhona = models.ForeignKey(Chayhana, on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=255)
     amount = models.DecimalField(max_digits=14, decimal_places=0)
     date = models.DateField(auto_now_add=True)
     def __str__(self):

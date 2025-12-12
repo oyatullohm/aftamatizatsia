@@ -833,11 +833,9 @@ class KassaViewset(ModelViewSet):
     def create(self, request, *args, **kwargs):
         data = request.data
         name = data.get('name')
-        initial_amount = data.get('initial_amount')
         kassa =  Kassa.objects.create(
             chayhona = request.user.chayhana,
             name = name,
-            initial_amount = initial_amount
         )
         return Response(KassaSerializer(kassa).data)
     

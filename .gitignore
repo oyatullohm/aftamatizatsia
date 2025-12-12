@@ -15,6 +15,7 @@ downloads/
 eggs/
 lib/
 lib64/
+data.json
 parts/
 sdist/
 var/
