@@ -3,6 +3,8 @@ from channels.generic.websocket import AsyncJsonWebsocketConsumer
 class KitchenOrderConsumer(AsyncJsonWebsocketConsumer):
     """Oshxona buyurtmalarini boshqarish uchun WebSocket consumer.
     
+    
+    
     Ushbu consumer ma'lum bir oshxona bo'limiga tegishli buyurtmalarni qabul qiladi va
     ularni tegishli guruhga yuboradi.
        Args:
