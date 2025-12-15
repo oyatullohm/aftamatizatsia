@@ -420,7 +420,7 @@ class OrderViewset(ModelViewSet):
         q = pginator.paginate_queryset(qs, request)  
         
         serializer = OrderSerializer(q, many=True)
-        return pginator.get_paginated_response(serializer)
+        return pginator.get_paginated_response(serializer.data)
 
 
     def create(self, request, *args, **kwargs):
