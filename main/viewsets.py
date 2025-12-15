@@ -950,6 +950,15 @@ class CostViewset(ModelViewSet):
         name = data.get('name')
         amount = data.get('amount')
         kassa_id = data.get('kassa_id')
+
+        kassa = Kassa.objects.get(id=kassa_id)
+        kassa.balance -= amount
+        if kassa.balance <0:
+            return Response({
+                "success":False,
+                "info":"Kassada yetarli mablag' yo'q"
+            }) 
+        kassa.save()
         cost =  Cost.objects.create(
             chayhona = request.user.chayhana,
             name = name,
@@ -959,7 +968,7 @@ class CostViewset(ModelViewSet):
         return Response(CostSerializer(cost).data)
     
     def destroy(self, request, *args, **kwargs):
-        self.get_queryset().get(id=kwargs['pk']).delete()
+        # self.get_queryset().get(id=kwargs['pk']).delete()
         return Response({
-            'success':True
+            'success':False
         })
