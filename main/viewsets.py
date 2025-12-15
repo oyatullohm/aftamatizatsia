@@ -768,9 +768,9 @@ class KitchenDepartmentViewset(ModelViewSet):
     
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        return Response({
+        return Response(
             KitchenDepartmentSerializer(queryset, many=True).data
-        })
+        )
     
     def retrieve(self, request, *args, **kwargs):
         printer = self.get_queryset().get(id=kwargs['pk'])
