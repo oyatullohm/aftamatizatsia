@@ -237,7 +237,8 @@ class KssaItem(models.Model):
 class Cost(models.Model):
     chayhona = models.ForeignKey(Chayhana, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
-    kassa = models.ForeignKey(Kassa, on_delete=models.CASCADE)
+    kassa = models.ForeignKey(Kassa, on_delete=models.CASCADE,  null=True,
+        blank=True)
     amount = models.DecimalField(max_digits=14, decimal_places=0)
     date = models.DateField(auto_now_add=True)
     def __str__(self):
