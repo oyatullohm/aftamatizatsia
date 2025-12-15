@@ -907,13 +907,17 @@ class CostViewset(ModelViewSet):
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
-        return Cost.objects.filter(chayhona=self.request.user.chayhana)
+        return Cost.objects.filter(chayhona=self.request.user.chayhana).order_by('-id')
     
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        return Response({
-            CostSerializer(queryset, many=True).data
-        })
+        pagenator = PageNumberPagination ()
+        pagenator.page_size = 20
+        q = pagenator.paginate_queryset(queryset, request)  
+        serializer = CostSerializer( q, many=True)
+        return pagenator.get_paginated_response(serializer.data)
+        
+
     
     def retrieve(self, request, *args, **kwargs):
         cost = self.get_queryset().get(id=kwargs['pk'])
@@ -928,6 +932,14 @@ class CostViewset(ModelViewSet):
         if name:
             cost.name = name
         if amount:
+            cost.kassa.balance -= cost.amount
+            cost.kassa.balance += amount
+            if cost.kassa.balance <0:
+                return Response({
+                    "success":False,
+                    "info":"Kassada yetarli mablag' yo'q"
+                }) 
+            cost.kassa.save()   
             cost.amount = amount
         cost.save()
         
@@ -937,9 +949,11 @@ class CostViewset(ModelViewSet):
         data = request.data
         name = data.get('name')
         amount = data.get('amount')
+        kassa_id = data.get('kassa_id')
         cost =  Cost.objects.create(
             chayhona = request.user.chayhana,
             name = name,
+            kassa_id = kassa_id,
             amount = amount
         )
         return Response(CostSerializer(cost).data)
