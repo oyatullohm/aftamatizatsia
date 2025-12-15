@@ -13,7 +13,8 @@ router.register(r'order', OrderViewset, basename='order')
 router.register(r'item', OrderItemViewset, basename='item')
 router.register(r'category',CategoryViewset, basename='categoyy')
 router.register(r'printer',KitchenDepartmentViewset, basename='printer')
-router.register(r'kassa',KassaViewset, basename='kassa')
+router.register(r'kassa',KassaViewset, basename='kassa') 
+router.register(r'kassaitem',KassaViewset, basename='kassaitem') 
 router.register(r'cost',CostViewset, basename='cost')
 
 
