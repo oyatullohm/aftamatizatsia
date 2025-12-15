@@ -122,3 +122,8 @@ class MobileCreateOrderSerializer(serializers.Serializer):
     phone = serializers.CharField(required=False, allow_blank=True)
     room_id = serializers.IntegerField(required=False, allow_null=True)
     items = MobileOrderItemSerializer(many=True)
+
+class KssaItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = KssaItem
+        fields = '__all__'

@@ -225,6 +225,15 @@ class Kassa(models.Model):
     date = models.DateField(auto_now_add=True)
     balance = models.DecimalField(max_digits=14, decimal_places=0, default=0)
 
+class KssaItem(models.Model):
+    chayhona = models.ForeignKey(Chayhana, on_delete=models.CASCADE)
+    kassa = models.ForeignKey(Kassa, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=14, decimal_places=0)
+    is_income = models.BooleanField()  # True - kirim, False - chiqim
+    description = models.CharField(max_length=255, null=True, blank=True)
+    date = models.DateTimeField(auto_now_add=True)
+
+
 class Cost(models.Model):
     chayhona = models.ForeignKey(Chayhana, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)

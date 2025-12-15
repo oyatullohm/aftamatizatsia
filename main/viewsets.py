@@ -17,7 +17,7 @@ class CategoryViewset(ModelViewSet):
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
-        return Category.objects.filter(chayhana=self.request.user.chayhana)
+        return Category.objects.filter(chayhana=self.request.user.chayhana).order_by('-id')
     
     def list(self, request, *args, **kwargs):
         serializers = CategorySerializer(self.get_queryset(),many= True)
@@ -57,7 +57,7 @@ class RoomViewset(ModelViewSet):
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
-        return Room.objects.filter(chayhana=self.request.user.chayhana).select_related('chayhana')
+        return Room.objects.filter(chayhana=self.request.user.chayhana).select_related('chayhana').order_by('-id')
     
     def list(self, request, *args, **kwargs):
         serializers = RoomSerializer(self.get_queryset(),many= True)
@@ -117,7 +117,7 @@ class ProductViewset(ModelViewSet):
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
-        return Product.objects.filter(chayhana=self.request.user.chayhana).select_related('chayhana')
+        return Product.objects.filter(chayhana=self.request.user.chayhana).select_related('chayhana').order_by('-id')
     
     def list(self, request, *args, **kwargs):
         serializers = ProductSerializer(self.get_queryset(),many= True)
@@ -174,7 +174,7 @@ class IncomePagination(PageNumberPagination):
 class IncomeProductViewset(ModelViewSet):
     permission_classes = [IsAuthenticated]
     def get_queryset(self):
-        return IncomeProduct.objects.filter(chayhana=self.request.user.chayhana).select_related('chayhana','product')
+        return IncomeProduct.objects.filter(chayhana=self.request.user.chayhana).select_related('chayhana','product').order_by('-id')
     
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset().order_by('-id')
@@ -265,7 +265,7 @@ class IncomeProductViewset(ModelViewSet):
 class MenuItemViewset(ModelViewSet):
     permission_classes = [IsAuthenticated]
     def get_queryset(self):
-        return MenuItem.objects.filter(chayhana=self.request.user.chayhana).select_related('chayhana','category')
+        return MenuItem.objects.filter(chayhana=self.request.user.chayhana).select_related('chayhana','category').order_by('-id')
     
     def list(self, request, *args, **kwargs):
         category_id = request.GET.get('category_id')
@@ -387,7 +387,7 @@ class OrderViewset(ModelViewSet):
     def get_queryset(self):
         return Order.objects.filter(chayhona=self.request.user.chayhana, finished=False).select_related(
             'chayhona','room'
-        ).prefetch_related('items')
+        ).prefetch_related('items').order_by('-id')
     
 
     
@@ -411,13 +411,16 @@ class OrderViewset(ModelViewSet):
         # ✅ finished bo‘yicha filtr (true/false)
         if finished is not None:
             if finished.lower() in ["true", "1"]:
-                qs =  Order.objects.filter(chayhona=self.request.user.chayhona,).filter(finished=True)
+                qs =  Order.objects.filter(chayhona=self.request.user.chayhona,).filter(finished=True).order_by('-id')
 
         if date_from:
             qs = qs.filter(arrival_time__date__gte=date_from)
-
-        serializer = OrderSerializer(qs, many=True)
-        return Response(serializer.data)
+        pginator = PageNumberPagination()
+        pginator.page_size = 20
+        q = pginator.paginate_queryset(qs, request)  
+        
+        serializer = OrderSerializer(q, many=True)
+        return pginator.get_paginated_response(serializer)
 
 
     def create(self, request, *args, **kwargs):
@@ -550,12 +553,21 @@ class OrderViewset(ModelViewSet):
 
             try:
                 kassa = Kassa.objects.get(id=kassa_id)
-            except Kassa.DoesNotExist:
-                return Response({"error": f"Kassa topilmadi: {kassa_id}"}, status=404)
+                kassa.balance += summa
+                kassa.save()
+                kassa_item = KssaItem.objects.create(  
+                    chayhona=request.user.chayhona,
+                    kassa=kassa,    
+                   amount=summa
 
-            kassa.balance += summa
-            kassa.save()
+                )
+                
+            except Kassa.DoesNotExist:
+                
+                return Response({"error": f"Kassa topilmadi: {kassa_id}"}, status=404)
             total_payment += summa
+
+            
 
         return Response({
             "success": True,
@@ -597,7 +609,7 @@ class OrderItemViewset(ModelViewSet):
         return  OrderItem.objects.filter(
             chayhona=self.request.user.chayhana,
             order_id=order_id
-        ).select_related('chayhona', 'order', 'menu_item')
+        ).select_related('chayhona', 'order', 'menu_item').order_by('-id')
     
     def list(self, request, *args, **kwargs):
         order_id = request.GET.get('order_id')
@@ -752,7 +764,7 @@ class KitchenDepartmentViewset(ModelViewSet):
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
-        return KitchenDepartment.objects.filter(chayhana=self.request.user.chayhana)
+        return KitchenDepartment.objects.filter(chayhana=self.request.user.chayhana).order_by('-id')
     
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -804,7 +816,7 @@ class KassaViewset(ModelViewSet):
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
-        return Kassa.objects.filter(chayhona=self.request.user.chayhana)
+        return Kassa.objects.filter(chayhona=self.request.user.chayhana).order_by('-id')
     
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -841,6 +853,55 @@ class KassaViewset(ModelViewSet):
         return Response({
             'success':True
         }) 
+
+class KssaItemViewset(ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        return KssaItem.objects.filter(chayhona=self.request.user.chayhana).order_by('-id')
+    
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        return Response(
+            KassaSerializer(queryset, many=True).data
+        )
+    
+    def retrieve(self, request, *args, **kwargs):
+        kassa = self.get_queryset().get(id=kwargs['pk'])
+        return Response(KassaSerializer(kassa).data)
+    
+    def update(self, request, *args, **kwargs):
+        data = request.data
+        amount = data.get('amount')
+        kassa = self.get_queryset().get(id=kwargs['pk'])
+        balasn = kassa.kassa.balance
+        balasn -= kassa.amount
+        balasn += amount
+        kassa.kassa.balance = balasn
+        if kassa.kassa.balance <0:
+            return Response({
+                "success":False,
+                "info":"Kassada yetarli mablag' yo'q"
+            }) 
+    
+        kassa.kassa.save()
+        if amount:
+            kassa.amount = amount
+        kassa.save()
+        
+        return Response(KassaSerializer(kassa).data)
+    
+    def create(self, request, *args, **kwargs):
+
+        return Response({
+            "success":False
+        })
+    
+    def destroy(self, request, *args, **kwargs):
+        self.get_queryset().get(id=kwargs['pk']).delete()
+        return Response({
+            'success':True
+        })
 
 class CostViewset(ModelViewSet):
     permission_classes = [IsAuthenticated]
