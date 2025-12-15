@@ -17,7 +17,7 @@ class CategoryViewset(ModelViewSet):
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
-        return Category.objects.filter(chayhana=self.request.user.chayhana).order_by('-id')
+        return Category.objects.filter(chayhana=self.request.user.chayhana).select_related('chayhana').order_by('-id')
     
     def list(self, request, *args, **kwargs):
         serializers = CategorySerializer(self.get_queryset(),many= True)
@@ -609,7 +609,7 @@ class OrderItemViewset(ModelViewSet):
         return  OrderItem.objects.filter(
             chayhona=self.request.user.chayhana,
             order_id=order_id
-        ).select_related('chayhona', 'order', 'menu_item').order_by('-id')
+        ).select_related('chayhona', 'order', 'menu_item','afisttyant').order_by('-id')
     
     def list(self, request, *args, **kwargs):
         order_id = request.GET.get('order_id')
@@ -764,7 +764,7 @@ class KitchenDepartmentViewset(ModelViewSet):
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
-        return KitchenDepartment.objects.filter(chayhana=self.request.user.chayhana).order_by('-id')
+        return KitchenDepartment.objects.filter(chayhana=self.request.user.chayhana).select_related('chayhana').order_by('-id')
     
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -816,7 +816,7 @@ class KassaViewset(ModelViewSet):
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
-        return Kassa.objects.filter(chayhona=self.request.user.chayhana).order_by('-id')
+        return Kassa.objects.filter(chayhona=self.request.user.chayhana).select_related('chayhona').order_by('-id')
     
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -858,7 +858,7 @@ class KssaItemViewset(ModelViewSet):
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
-        return KssaItem.objects.filter(chayhona=self.request.user.chayhana).order_by('-id')
+        return KssaItem.objects.filter(chayhona=self.request.user.chayhana).select_related('chayhona', 'kassa').order_by('-id')
     
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -907,7 +907,7 @@ class CostViewset(ModelViewSet):
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
-        return Cost.objects.filter(chayhona=self.request.user.chayhana).order_by('-id')
+        return Cost.objects.filter(chayhona=self.request.user.chayhana).select_related('chayhona','kassa').order_by('-id')
     
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
