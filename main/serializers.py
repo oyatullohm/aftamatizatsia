@@ -123,6 +123,7 @@ class MobileCreateOrderSerializer(serializers.Serializer):
     room_id = serializers.IntegerField(required=False, allow_null=True)
     items = MobileOrderItemSerializer(many=True)
 
+
 class KssaItemSerializer(serializers.ModelSerializer):
     kassa = KassaSerializer()
     class Meta:

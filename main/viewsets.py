@@ -873,11 +873,14 @@ class KassaItemViewset(ModelViewSet):
         return KssaItem.objects.filter(chayhona=self.request.user.chayhana).select_related('chayhona', 'kassa', 'order').order_by('-id')
     
     def list(self, request, *args, **kwargs):
+        
         queryset = self.get_queryset()
-        return Response(
-            KssaItemSerializer(queryset, many=True).data
-        )
-    
+        page = PageNumberPagination ()
+        page.page_size = 2
+        q = page.paginate_queryset(queryset, request)  
+        serializer = KssaItemSerializer( q, many=True)
+        return page.get_paginated_response(serializer.data)
+
     def retrieve(self, request, *args, **kwargs):
         kassa = self.get_queryset().get(id=kwargs['pk'])
         return Response(KssaItemSerializer(kassa).data)
