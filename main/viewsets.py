@@ -508,7 +508,7 @@ class OrderViewset(ModelViewSet):
             return Response({"error": "Payments bo‘sh bo‘lishi mumkin emas"}, status=400)
 
         order = self.get_queryset().get(id=pk)
-
+        
         # Afitsiantni aniqlaymiz
         item = order.items.filter(cancel=False).first()
         if not item or not item.afisttyant:
