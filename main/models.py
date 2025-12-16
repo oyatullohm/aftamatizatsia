@@ -230,7 +230,7 @@ class KssaItem(models.Model):
     kassa = models.ForeignKey(Kassa, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=14, decimal_places=0)
     is_income = models.BooleanField()  # True - kirim, False - chiqim
-    description = models.CharField(max_length=255, null=True, blank=True)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True, blank=True)   
     date = models.DateTimeField(auto_now_add=True)
 
 

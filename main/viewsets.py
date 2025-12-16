@@ -504,7 +504,7 @@ class OrderViewset(ModelViewSet):
     def finished(self, request, pk=None):
         service_sum = 0
         payments = request.data.get('payments', [])   # bir nechta to‘lov
-        afisyant = request.data.get('afisyant')   # bir nechta to‘lov
+        afisyant = request.data.get('afisyant')   # afitsiant idsi
         
         if not payments:
             return Response({"error": "Payments bo‘sh bo‘lishi mumkin emas"}, status=400)
