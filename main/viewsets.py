@@ -543,7 +543,7 @@ class OrderViewset(ModelViewSet):
 
         # 🔥 Kassa bo‘yicha to‘lovlarni qo‘shish
         total_payment = 0
-
+        harakatlar = []
         for p in payments:
             kassa_id = p.get('kassa_id')
             summa = p.get('summa')
@@ -555,13 +555,14 @@ class OrderViewset(ModelViewSet):
                 kassa = Kassa.objects.get(id=kassa_id)
                 kassa.balance += summa
                 kassa.save()
+                
                 kassa_item = KssaItem.objects.create(  
                     chayhona=request.user.chayhana,
                     kassa=kassa,    
                    amount=summa
 
                 )
-                
+                harakatlar.append(kassa_item)
             except Kassa.DoesNotExist:
                 
                 return Response({"error": f"Kassa topilmadi: {kassa_id}"}, status=404)
@@ -575,7 +576,8 @@ class OrderViewset(ModelViewSet):
             "paid_sum": total_payment,
             "service_sum": service_sum,
             "income_user_total": income_user.total_summa,
-            "message": "Order yakunlandi va to‘lovlar bir nechta kassaga bo‘lindi"
+            "message": "Order yakunlandi va to‘lovlar bir nechta kassaga bo‘lindi",
+            "harakatlar": KssaItemSerializer(harakatlar, many=True).data
         })
 
             
