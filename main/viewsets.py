@@ -502,13 +502,15 @@ class OrderViewset(ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def finished(self, request, pk=None):
+        service_sum = 0
         payments = request.data.get('payments', [])   # bir nechta to‘lov
+        afisyant = request.data.get('afisyant')   # bir nechta to‘lov
         
         if not payments:
             return Response({"error": "Payments bo‘sh bo‘lishi mumkin emas"}, status=400)
 
         order = self.get_queryset().get(id=pk)
-        
+
         # Afitsiantni aniqlaymiz
         item = order.items.filter(cancel=False).first()
         if not item or not item.afisttyant:
@@ -520,13 +522,19 @@ class OrderViewset(ModelViewSet):
 
         # IncomeUser
         today = date.today()
-        if user:
+        try:
+            user_2 = CustomUser.objects.get(id=afisyant)
+        except :
+            user_2 = None
+        if user  or user_2:
+            if user_2:
+                user = user_2
             income_user, created = IncomeUser.objects.get_or_create(
                 chayhona=order.chayhona,
                 user=user,
                 date=today,
             )
-
+       
         # Service hisoblash
             service_sum = order.calculate_service()
 
