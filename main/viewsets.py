@@ -584,7 +584,6 @@ class OrderViewset(ModelViewSet):
             "order_total": order.total_summa,
             "paid_sum": total_payment,
             "service_sum": service_sum,
-            "income_user_total": income_user.total_summa,
             "message": "Order yakunlandi va to‘lovlar bir nechta kassaga bo‘lindi",
             "harakatlar": KssaItemSerializer(harakatlar, many=True).data
         })
