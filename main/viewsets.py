@@ -876,7 +876,7 @@ class KassaItemViewset(ModelViewSet):
         
         queryset = self.get_queryset()
         page = PageNumberPagination ()
-        page.page_size = 2
+        page.page_size = 20
         q = page.paginate_queryset(queryset, request)  
         serializer = KssaItemSerializer( q, many=True)
         return page.get_paginated_response(serializer.data)
