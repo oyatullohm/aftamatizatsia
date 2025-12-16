@@ -865,7 +865,7 @@ class KassaViewset(ModelViewSet):
             'success':True
         }) 
 
-class KssaItemViewset(ModelViewSet):
+class KassaItemViewset(ModelViewSet):
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
