@@ -516,8 +516,7 @@ class OrderViewset(ModelViewSet):
         else:
             user = None
         # Orderni tugatamiz
-        order.finished = True
-        order.save()
+        
 
         # IncomeUser
         today = date.today()
@@ -559,7 +558,8 @@ class OrderViewset(ModelViewSet):
                 kassa_item = KssaItem.objects.create(  
                     chayhona=request.user.chayhana,
                     kassa=kassa,    
-                   amount=summa
+                   amount=summa,
+                   is_income=True
 
                 )
                 harakatlar.append(kassa_item)
@@ -569,7 +569,8 @@ class OrderViewset(ModelViewSet):
             total_payment += summa
 
             
-
+        order.finished = True
+        order.save()
         return Response({
             "success": True,
             "order_total": order.total_summa,
