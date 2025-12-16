@@ -567,6 +567,7 @@ class OrderViewset(ModelViewSet):
                     chayhona=request.user.chayhana,
                     kassa=kassa,    
                    amount=summa,
+                   order=order,
                    is_income=True
 
                 )
