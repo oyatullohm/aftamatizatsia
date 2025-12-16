@@ -556,7 +556,7 @@ class OrderViewset(ModelViewSet):
                 kassa.balance += summa
                 kassa.save()
                 kassa_item = KssaItem.objects.create(  
-                    chayhona=request.user.chayhona,
+                    chayhona=request.user.chayhana,
                     kassa=kassa,    
                    amount=summa
 
@@ -762,6 +762,7 @@ class OrderItemViewset(ModelViewSet):
 
 class KitchenDepartmentViewset(ModelViewSet):
     permission_classes = [IsAuthenticated]
+
     
     def get_queryset(self):
         return KitchenDepartment.objects.filter(chayhana=self.request.user.chayhana).select_related('chayhana').order_by('-id')
