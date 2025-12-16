@@ -899,9 +899,9 @@ class KssaItemViewset(ModelViewSet):
         if amount:
             kassa.amount = amount
         kassa.save()
-        
-        return Response(KassaSerializer(kassa).data)
-    
+
+        return Response(KssaItemSerializer(kassa).data)
+
     def create(self, request, *args, **kwargs):
 
         return Response({
@@ -909,9 +909,8 @@ class KssaItemViewset(ModelViewSet):
         })
     
     def destroy(self, request, *args, **kwargs):
-        self.get_queryset().get(id=kwargs['pk']).delete()
         return Response({
-            'success':True
+            'success':False
         })
 
 class CostViewset(ModelViewSet):
