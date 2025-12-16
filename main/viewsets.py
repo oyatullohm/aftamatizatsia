@@ -874,12 +874,12 @@ class KassaItemViewset(ModelViewSet):
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         return Response(
-            KassaSerializer(queryset, many=True).data
+            KssaItemSerializer(queryset, many=True).data
         )
     
     def retrieve(self, request, *args, **kwargs):
         kassa = self.get_queryset().get(id=kwargs['pk'])
-        return Response(KassaSerializer(kassa).data)
+        return Response(KssaItemSerializer(kassa).data)
     
     def update(self, request, *args, **kwargs):
         data = request.data
