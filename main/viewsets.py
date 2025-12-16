@@ -870,7 +870,7 @@ class KassaItemViewset(ModelViewSet):
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
-        return KssaItem.objects.filter(chayhona=self.request.user.chayhana).select_related('chayhona', 'kassa').order_by('-id')
+        return KssaItem.objects.filter(chayhona=self.request.user.chayhana).select_related('chayhona', 'kassa', 'order').order_by('-id')
     
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
