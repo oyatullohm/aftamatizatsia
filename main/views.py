@@ -276,11 +276,11 @@ class MobileCreateOrderView(APIView):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def url (request):
-    menu = f"/menu-client/{request.user.chayhana.uid}/"
+    menu = f"/api/menu-client/{request.user.chayhana.uid}/"
     order_url = []
     for i in Room.objects.filter(chayhana=request.user.chayhana):
         order_url.append(
-            [i.name ,f"/shot/{i.id}/"]
+            [i.name ,f"/api/shot/{i.id}/"]
         )
     return Response(
         {
