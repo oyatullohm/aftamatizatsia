@@ -271,7 +271,8 @@ class MenuItemViewset(ModelViewSet):
         category_id = request.GET.get('category_id')
         queryset = self.get_queryset()
         if category_id:
-            queryset =queryset.filter( category_id=category_id)
+            queryset =queryset.filter( category_id=category_id,count__gte=0)
+            
         serializers = MenuItemAdminSerializer(queryset,many= True)
         return Response(serializers.data)
     
