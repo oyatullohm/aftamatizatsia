@@ -411,7 +411,7 @@ class OrderViewset(ModelViewSet):
         # ✅ finished bo‘yicha filtr (true/false)
         if finished is not None:
             if finished.lower() in ["true", "1"]:
-                qs =  Order.objects.filter(chayhona=self.request.user.chayhona,).filter(finished=True).order_by('-id')
+                qs =  Order.objects.filter(chayhona=self.request.user.chayhana,).filter(finished=True).order_by('-id')
 
         if date_from:
             qs = qs.filter(arrival_time__date__gte=date_from)
