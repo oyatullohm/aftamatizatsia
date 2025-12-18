@@ -98,6 +98,9 @@ class CustomUserSerializer(serializers.ModelSerializer):
                   ]
         
 class CategorySerializer(serializers.ModelSerializer):
+    count = serializers.SerializerMethodField()
+    def get_count(self, obj):
+        return MenuItem.objects.filter(category=obj,chayhana=obj.chayhana,is_active=True).count()
     class Meta:
         model = Category
         fields = '__all__'
