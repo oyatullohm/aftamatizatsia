@@ -271,7 +271,7 @@ class MenuItemViewset(ModelViewSet):
         category_id = request.GET.get('category_id')
         queryset = self.get_queryset()
         if category_id:
-            queryset =queryset.filter( category_id=category_id,count__gte=0)
+            queryset =queryset.filter( category_id=category_id)
             
         serializers = MenuItemAdminSerializer(queryset,many= True)
         return Response(serializers.data)
@@ -279,7 +279,7 @@ class MenuItemViewset(ModelViewSet):
     @action(detail=False, methods=['get'])
     def list_(self, request, *args, **kwargs):
         category_id = request.GET.get('category_id')
-        queryset = self.get_queryset().filter(is_active=True)
+        queryset = self.get_queryset().filter(is_active=True,count__gte=0)
         if category_id:
             queryset =queryset.filter( category_id=category_id)
         serializers = MenuItemSerializer(queryset,many= True)
