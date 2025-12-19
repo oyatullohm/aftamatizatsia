@@ -35,7 +35,6 @@ urlpatterns = [
    
    path('menu-client/<int:pk>/', menu, name='menu-client'),
    path('shot/<int:id>/', shot, name='shot'),
-
-   
+   path('statistic/', statistic, name='statistic'),
 ]
 urlpatterns+=router.urls
