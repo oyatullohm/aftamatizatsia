@@ -127,8 +127,8 @@ class MobileCreateOrderSerializer(serializers.Serializer):
     items = MobileOrderItemSerializer(many=True)
 
 
-class KssaItemSerializer(serializers.ModelSerializer):
+class KassaItemSerializer(serializers.ModelSerializer):
     kassa = KassaSerializer()
     class Meta:
-        model = KssaItem
+        model = KassaItem
         fields = '__all__'

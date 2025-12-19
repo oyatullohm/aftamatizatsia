@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from datetime import datetime, timedelta
 from collections import defaultdict
+from django.db.models import Count
 from django.utils import timezone
 from rest_framework import status
 from .serializers import *
@@ -307,5 +308,46 @@ def shot(request,id):
 def menu(request, pk):
     m = MenuItem.objects.filter(chayhana__uid=pk, is_active=True,)
     return Response(MenuItemSerializer(m, many=True).data)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def statistic(request):
+    chayhana = request.user.chayhana
+    today = timezone.now().date()
+    orders = Order.objects.filter(chayhona=chayhana,cancel=False)
+    orders_month = orders.filter(created_at__month=today.month, created_at__year=today.year).count()
+    orders_today = orders.filter(created_at__date=today).count()
+    orders_week = orders.filter(created_at__week=today.isocalendar()[1], created_at__year=today.year).count()
+    kassa = KassaItem.objects.filter(chayhona=chayhana)
+    kassa_today = sum(item.amount for item in kassa.filter(date__date=today))
+    kassa_week = sum(item.amount for item in kassa.filter(date__week=today.isocalendar()[1], date__year=today.year))
+    kassa_month = sum(item.amount for item in kassa.filter(date__month=today.month, date__year=today.year))
+
+    # Top 5 eng ko'p sotilgan menu itemlar
+    top_menu_items = OrderItem.objects.filter(
+        chayhona=chayhana,
+        order__cancel=False
+    ).values('menu_item__id', 'menu_item__name').annotate(
+        total_quantity=Count('quantity')
+    ).order_by('-total_quantity')[:5]
+
+    top_menu_items = [
+        {
+            "menu_item_id": item['menu_item__id'],
+            "menu_item_name": item['menu_item__name'],
+            "total_quantity": item['total_quantity']
+        }
+        for item in top_menu_items
+    ] 
+    return Response({
+        "kassa_today": kassa_today, # bugungi kassa
+        "kassa_week": kassa_week, # haftalik kassa
+        "kassa_month": kassa_month, # oylik kassa
+        "orders_today": orders_today, # bugungi buyurtmalar soni
+        "orders_week": orders_week, # haftalik buyurtmalar soni
+        "orders_month": orders_month, # oylik buyurtmalar soni
+        "top_menu_items": top_menu_items # eng ko'p sotilgan menu itemlar
+    })
+
 
 

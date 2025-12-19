@@ -564,7 +564,7 @@ class OrderViewset(ModelViewSet):
                 kassa.balance += summa
                 kassa.save()
                 
-                kassa_item = KssaItem.objects.create(  
+                kassa_item = KassaItem.objects.create(  
                     chayhona=request.user.chayhana,
                     kassa=kassa,    
                    amount=summa,
@@ -587,7 +587,7 @@ class OrderViewset(ModelViewSet):
             "paid_sum": total_payment,
             "service_sum": service_sum,
             "message": "Order yakunlandi va to‘lovlar bir nechta kassaga bo‘lindi",
-            "harakatlar": KssaItemSerializer(harakatlar, many=True).data
+            "harakatlar": KassaItemSerializer(harakatlar, many=True).data
         })
 
             
@@ -871,7 +871,7 @@ class KassaItemViewset(ModelViewSet):
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
-        return KssaItem.objects.filter(chayhona=self.request.user.chayhana).select_related('chayhona', 'kassa', 'order').order_by('-id')
+        return KassaItem.objects.filter(chayhona=self.request.user.chayhana).select_related('chayhona', 'kassa', 'order').order_by('-id')
     
     def list(self, request, *args, **kwargs):
         
@@ -879,12 +879,12 @@ class KassaItemViewset(ModelViewSet):
         page = PageNumberPagination ()
         page.page_size = 20
         q = page.paginate_queryset(queryset, request)  
-        serializer = KssaItemSerializer( q, many=True)
+        serializer = KassaItemSerializer( q, many=True)
         return page.get_paginated_response(serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
         kassa = self.get_queryset().get(id=kwargs['pk'])
-        return Response(KssaItemSerializer(kassa).data)
+        return Response(KassaItemSerializer(kassa).data)
     
     def update(self, request, *args, **kwargs):
         data = request.data
@@ -905,7 +905,7 @@ class KassaItemViewset(ModelViewSet):
             kassa.amount = amount
         kassa.save()
 
-        return Response(KssaItemSerializer(kassa).data)
+        return Response(KassaItemSerializer(kassa).data)
 
     def create(self, request, *args, **kwargs):
 
