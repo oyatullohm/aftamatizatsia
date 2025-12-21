@@ -324,9 +324,9 @@ def statistic(request):
     kassa = KassaItem.objects.filter(chayhona=chayhana)
 
     # ---- ORDERS ----
-    orders_today = orders.filter(created_at__date=today).count()
-    orders_week = orders.filter(created_at__week=week, created_at__year=year).count()
-    orders_month = orders.filter(created_at__month=month, created_at__year=year).count()
+    orders_today = orders.filter(arrival_time__date=today,arrival_time__year=year).count()
+    orders_week = orders.filter(arrival_time__week=week, arrival_time__year=year).count()
+    orders_month = orders.filter(arrival_time__month=month, arrival_time__year=year).count()
 
     # ---- KASSA (DB SUM) ----
     kassa_today = kassa.filter(date__date=today).aggregate(
@@ -361,3 +361,5 @@ def statistic(request):
         "orders_month": orders_month,
         "top_menu_items": list(top_menu_items)
     })
+
+

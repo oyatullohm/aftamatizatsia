@@ -390,6 +390,8 @@ class OrderViewset(ModelViewSet):
             'chayhona','room'
         ).prefetch_related('items').order_by('-id')
     
+    def retrieve(self, request, *args, **kwargs):
+        return Response(OrderSerializer(Order.objects.get(id=kwargs['pk'])).data)
 
     
     def list(self, request, *args, **kwargs):
@@ -614,7 +616,32 @@ class OrderViewset(ModelViewSet):
         return Response({
             "success":False
         })
+    
+    @action(detail=False, methods=['get'])
+    def free_order(self, request, *args, **kwargs):
+        """ shu joyda order items  bolsa  uni useri bosa o'shalar chiqmasin """
+        free_order = self.get_queryset().filter(items__afisttyant__isnull=True).distinct()
+        serializers = OrderSerializer(free_order, many=True)
+        return Response(serializers.data)
 
+    @action(detail=False, methods=['get'])
+    def my_orders(self, request, *args, **kwargs):
+        """ shu joyda order items da afisttyant ni filter qilish kk  request user ga teng bolganlari kk"""
+        my_orders = (
+        self.get_queryset()
+        .filter(items__afisttyant=request.user)
+        .distinct()
+        
+        )
+        serializer = OrderSerializer(
+            my_orders,
+            many=True,
+        )
+        return Response(serializer.data)
+
+        
+    
+    
 class OrderItemViewset(ModelViewSet):
     permission_classes =[ IsAuthenticated]
     def get_queryset(self,order_id):
