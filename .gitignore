@@ -58,4 +58,6 @@ db.sqlite3
 images
 celerybeat-schedule
 venv/
-media/debug.log
+media/
+media/
+debug.log
