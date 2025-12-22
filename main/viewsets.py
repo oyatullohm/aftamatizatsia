@@ -394,6 +394,7 @@ class OrderViewset(ModelViewSet):
         order = OrderSerializer(self.get_queryset().get(id=kwargs['pk'])).data
         items = OrderItemSerializer(self.get_queryset().get(id=kwargs['pk'])\
             .items.all().select_related('menu_item','order','chayhona'),many=True).data
+        
         return Response({'order':order,'items':items})
 
     
