@@ -742,7 +742,7 @@ class OrderItemViewset(ModelViewSet):
                     minus_amount = konsum * quantity
                     product.count -= minus_amount
                     product.save()
-                    menu_item -= order_item.quantity
+                    menu_item.count -= order_item.quantity
                     menu_item.save()
             print_kitchen_check(created_items)
 
