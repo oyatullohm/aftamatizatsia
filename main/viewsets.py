@@ -391,8 +391,10 @@ class OrderViewset(ModelViewSet):
         ).prefetch_related('items').order_by('-id')
     
     def retrieve(self, request, *args, **kwargs):
-        
-        return Response({'order':OrderSerializer(self.get_queryset().get(id=kwargs['pk'])).data,'items':OrderItemSerializer(self.get_queryset().get(id=kwargs['pk']).items.all(),many=True).data})
+        order = OrderSerializer(self.get_queryset().get(id=kwargs['pk'])).data
+        items = OrderItemSerializer(self.get_queryset().get(id=kwargs['pk'])\
+            .items.all().select_related('menu_item','order','chayhona'),many=True).data
+        return Response({'order':order,'items':items})
 
     
     def list(self, request, *args, **kwargs):
