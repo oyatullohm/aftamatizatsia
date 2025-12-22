@@ -744,6 +744,7 @@ class OrderItemViewset(ModelViewSet):
                     product.save()
                     menu_item.count -= order_item.quantity
                     menu_item.save()
+                    
             print_kitchen_check(created_items)
 
 
