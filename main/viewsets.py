@@ -602,6 +602,11 @@ class OrderViewset(ModelViewSet):
             for i in order.items.filter(cancel=False):
                 i.menu_item += i.quantity
                 i.menu_item.save()
+                for ingredient in i.menu_item.ingredients.all():
+                    product = Product.objects.get(id=ingredient.id)
+                    minus_amount = ingredient.quantity * i.quantity
+                    product.count += minus_amount
+                    product.save()
             order.save()
             return Response({
                 "success":True
@@ -620,7 +625,8 @@ class OrderViewset(ModelViewSet):
     @action(detail=False, methods=['get'])
     def free_order(self, request, *args, **kwargs):
         """ shu joyda order items  bolsa  uni useri bosa o'shalar chiqmasin """
-        free_order = self.get_queryset().filter(items__afisttyant__isnull=True).distinct()
+        today = timezone.now().date() # bugungi sana
+        free_order = self.get_queryset().filter(items__afisttyant__isnull=True, arrival_time__date=today).distinct() # faqat afisttyant bo'lmaganlar va bugungi sanadagi orderlar qaytarilsin
         serializers = OrderSerializer(free_order, many=True)
         return Response(serializers.data)
 
@@ -629,8 +635,8 @@ class OrderViewset(ModelViewSet):
         """ shu joyda order items da afisttyant ni filter qilish kk  request user ga teng bolganlari kk"""
         my_orders = (
         self.get_queryset()
-        .filter(items__afisttyant=request.user)
-        .distinct()
+        .filter(items__afisttyant=request.user) # faqat o'ziga tegishli orderlarni olish
+        .distinct() # takroriy orderlarni olib tashlash uchun
         
         )
         serializer = OrderSerializer(
@@ -639,9 +645,6 @@ class OrderViewset(ModelViewSet):
         )
         return Response(serializer.data)
 
-        
-    
-    
 class OrderItemViewset(ModelViewSet):
     permission_classes =[ IsAuthenticated]
     def get_queryset(self,order_id):
@@ -693,20 +696,33 @@ class OrderItemViewset(ModelViewSet):
                     quantity = 1
 
                 # 🔥 OrderItem qo‘shamiz yoki yangilaymiz
-                order_item, created = OrderItem.objects.get_or_create(
+                order_item = OrderItem.objects.filter(
+                order=order,
+                chayhona=request.user.chayhana,
+                menu_item_id=menu_item_id
+                     ).first()
+
+            # Agar mavjud bo‘lsa — permission tekshir
+                if order_item:
+                    if order_item.afisttyant != request.user:
+                        return Response(
+                        {"permission": "bu buyurtma sizga tegishli emas"},
+                        status=403
+                    )
+                    order_item.quantity += quantity
+                    order_item.save()
+                else:
+                    order_item = OrderItem.objects.create(
                     order=order,
                     chayhona=request.user.chayhana,
                     menu_item_id=menu_item_id,
-                    defaults={"quantity": quantity}
+                    quantity=quantity,
+                    afisttyant=request.user
                 )
-
-                if not created:
-                    order_item.quantity += quantity
-                    order_item.save()
 
                 created_items.append(order_item)
 
-                # --------------------------
+                
                 # 🔥 Omborni kamaytirish
                 # --------------------------
                 menu_item = order_item.menu_item
@@ -718,8 +734,7 @@ class OrderItemViewset(ModelViewSet):
 
                     try:
                         product = Product.objects.get(
-                            id=product_id,
-                            chayhona=request.user.chayhana
+                            id=product_id
                         )
                     except:
                         continue
@@ -754,7 +769,7 @@ class OrderItemViewset(ModelViewSet):
                 konsum = ingredient.get("quantity")   # 1 porsiya uchun sarf
 
                 try:
-                    product = Product.objects.get(id=product_id, chayhona=request.user.chayhana)
+                    product = Product.objects.get(id=product_id)
                     minus_amount = konsum * added_quantity
                     product.count -= minus_amount
                     product.save()
@@ -778,7 +793,7 @@ class OrderItemViewset(ModelViewSet):
                 menu_item += item.quantity 
                 menu_item.save()
                 try:
-                    product = Product.objects.get(id=product_id, chayhona=request.user.chayhona)
+                    product = Product.objects.get(id=product_id)
                 except Product.DoesNotExist:
                     continue  # Product topilmasa skip
 
